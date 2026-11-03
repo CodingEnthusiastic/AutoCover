@@ -1,314 +1,2069 @@
 \documentclass[11pt,a4paper]{article}
 
+% ============================================================
+% PACKAGES
+% ============================================================
+
 \usepackage[utf8]{inputenc}
-\usepackage[margin=0.9in]{geometry}
-\usepackage{hyperref}
-\usepackage{amsmath,amssymb}
-\usepackage{booktabs}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+
+\usepackage[a4paper,margin=0.85in,headheight=15pt]{geometry}
+
+\usepackage[dvipsnames,table]{xcolor}
 \usepackage{graphicx}
-\usepackage{xcolor}
-\usepackage{listings}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{float}
+
+\usepackage{amsmath,amssymb}
 \usepackage{enumitem}
-\usepackage{fancyhdr}
-\usepackage{tcolorbox}
+\usepackage{listings}
 \usepackage{caption}
 \usepackage{subcaption}
-\usepackage{float}
+
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{lastpage}
+\usepackage{setspace}
+
+\usepackage{tikz}
+\usetikzlibrary{
+    arrows.meta,
+    positioning,
+    shapes.geometric,
+    calc
+}
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable,skins}
+
+\usepackage{hyperref}
+
+% ============================================================
+% COLOUR PALETTE
+% ============================================================
+
+\definecolor{Navy}{HTML}{14213D}
+\definecolor{Blue}{HTML}{2563EB}
+\definecolor{Accent}{HTML}{0EA5E9}
+\definecolor{Teal}{HTML}{0F766E}
+\definecolor{Green}{HTML}{15803D}
+\definecolor{Orange}{HTML}{C2410C}
+\definecolor{Slate}{HTML}{475569}
+\definecolor{LightBlue}{HTML}{EFF6FF}
+\definecolor{LightTeal}{HTML}{F0FDFA}
+\definecolor{LightGray}{HTML}{F8FAFC}
+\definecolor{MidGray}{HTML}{CBD5E1}
+\definecolor{CodeBg}{HTML}{F1F5F9}
+\definecolor{CodeFrame}{HTML}{CBD5E1}
+
+% ============================================================
+% HYPERREF CONFIGURATION
+% ============================================================
 
 \hypersetup{
     colorlinks=true,
-    linkcolor=blue!75!black,
-    citecolor=blue!75!black,
-    urlcolor=blue!75!black
+    linkcolor=Blue,
+    citecolor=Teal,
+    urlcolor=Blue,
+    pdftitle={AutoCover - Technical Engineering Report},
+    pdfauthor={Rishabh},
+    pdfsubject={Smart Vehicle Insurance Comparison and Policy Management Platform}
 }
+
+\urlstyle{same}
+
+% ============================================================
+% DOCUMENT STYLE
+% ============================================================
+
+\setstretch{1.12}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+
+\setlist[itemize]{
+    leftmargin=1.5em,
+    itemsep=3pt,
+    topsep=4pt
+}
+
+\setlist[enumerate]{
+    leftmargin=1.7em,
+    itemsep=4pt,
+    topsep=4pt
+}
+
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.25}
+
+\captionsetup{
+    font=small,
+    labelfont=bf,
+    justification=centering
+}
+
+% ============================================================
+% HEADER AND FOOTER
+% ============================================================
 
 \pagestyle{fancy}
 \fancyhf{}
-\rhead{\textbf{AutoCover} --- Technical Report}
-\lhead{Full-Stack Engineering Evaluation}
-\rfoot{Page \thepage}
 
-\lstset{
+\lhead{\small\textcolor{Slate}{Full-Stack Engineering Evaluation}}
+\rhead{\small\textcolor{Navy}{\textbf{AutoCover}}}
+\cfoot{\small\textcolor{Slate}{Page \thepage\ of \pageref{LastPage}}}
+
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\renewcommand{\headrule}{
+    \hbox to\headwidth{
+        \color{MidGray}\leaders\hrule height \headrulewidth\hfill
+    }
+}
+
+% ============================================================
+% SECTION FORMATTING
+% ============================================================
+
+\titleformat{\section}
+    {\Large\bfseries\color{Navy}}
+    {\thesection.}
+    {0.6em}
+    {}
+    [\vspace{2pt}\color{MidGray}\titlerule]
+
+\titleformat{\subsection}
+    {\large\bfseries\color{Blue}}
+    {\thesubsection}
+    {0.7em}
+    {}
+
+\titleformat{\subsubsection}
+    {\normalsize\bfseries\color{Teal}}
+    {\thesubsubsection}
+    {0.7em}
+    {}
+
+\titlespacing*{\section}{0pt}{20pt}{10pt}
+\titlespacing*{\subsection}{0pt}{14pt}{6pt}
+\titlespacing*{\subsubsection}{0pt}{10pt}{4pt}
+
+% ============================================================
+% CODE LISTING CONFIGURATION
+% ============================================================
+
+\lstdefinelanguage{json}{
     basicstyle=\ttfamily\footnotesize,
-    breaklines=true,
-    frame=single,
-    backgroundcolor=\color{slate!5!white},
-    keywordstyle=\color{blue!80!black},
-    commentstyle=\color{gray},
-    stringstyle=\color{teal!80!black}
+    showstringspaces=false,
+    string=[s]{"}{"},
+    stringstyle=\color{Teal},
+    comment=[l]{//},
+    commentstyle=\color{Slate}\itshape,
+    keywordstyle=\color{Blue}\bfseries,
+    morekeywords={true,false,null}
 }
 
-\title{
-    \vspace{-1.5em}
-    \textbf{\Huge AutoCover}\\[0.3em]
-    \textbf{\Large Smart Vehicle Insurance Comparison \& Policy Management Platform}\\[0.4em]
-    \large Full-Stack Technical Evaluation \& Comprehensive Engineering Report
+\lstdefinestyle{reportcode}{
+    basicstyle=\ttfamily\footnotesize,
+    backgroundcolor=\color{CodeBg},
+    frame=single,
+    rulecolor=\color{CodeFrame},
+    frameround=tttt,
+    breaklines=true,
+    breakatwhitespace=false,
+    keepspaces=true,
+    showstringspaces=false,
+    numbers=left,
+    numberstyle=\tiny\color{Slate},
+    numbersep=8pt,
+    xleftmargin=1.5em,
+    framexleftmargin=1.2em,
+    tabsize=4,
+    captionpos=b,
+    columns=fullflexible,
+    keywordstyle=\color{Blue}\bfseries,
+    commentstyle=\color{Slate}\itshape,
+    stringstyle=\color{Teal}
 }
-\author{
-    \textbf{Candidate:} Rishabh \\
-    \textbf{Repository:} \url{https://github.com/CodingEnthusiastic/AutoCover} \\
-    \textbf{Assessment Reference Date:} 10 November 2026 (IST)
+
+\lstset{style=reportcode}
+
+% ============================================================
+% TABLE COLUMN TYPES
+% ============================================================
+
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+
+% ============================================================
+% REUSABLE BOXES
+% ============================================================
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    breakable,
+    colback=LightBlue,
+    colframe=Blue,
+    boxrule=0.7pt,
+    arc=2mm,
+    left=3mm,
+    right=3mm,
+    top=2mm,
+    bottom=2mm,
+    fonttitle=\bfseries,
+    coltitle=Navy,
+    #1
 }
-\date{\today}
+
+\newtcolorbox{successbox}[1][]{
+    enhanced,
+    breakable,
+    colback=LightTeal,
+    colframe=Teal,
+    boxrule=0.7pt,
+    arc=2mm,
+    left=3mm,
+    right=3mm,
+    top=2mm,
+    bottom=2mm,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    breakable,
+    colback=Orange!5,
+    colframe=Orange,
+    boxrule=0.7pt,
+    arc=2mm,
+    left=3mm,
+    right=3mm,
+    top=2mm,
+    bottom=2mm,
+    #1
+}
+
+% ============================================================
+% DOCUMENT
+% ============================================================
 
 \begin{document}
 
-\maketitle
-\thispagestyle{fancy}
+% ============================================================
+% TITLE PAGE
+% ============================================================
+
+\begin{titlepage}
+
+\thispagestyle{empty}
+
+\vspace*{1.0cm}
+
+\begin{center}
+
+{\color{Accent}\rule{0.85\textwidth}{2pt}}
+
+\vspace{1.3cm}
+
+{\Huge\bfseries\color{Navy} AutoCover}
+
+\vspace{0.35cm}
+
+{\Large\bfseries
+Smart Vehicle Insurance Comparison\\
+\& Policy Management Platform
+}
+
+\vspace{0.8cm}
+
+{\large\color{Slate}
+Full-Stack Technical Evaluation\\
+Comprehensive Engineering Report
+}
+
+\vspace{1.4cm}
+
+\begin{tikzpicture}
+    \node[
+        draw=Blue,
+        rounded corners=8pt,
+        fill=LightBlue,
+        line width=1.2pt,
+        minimum width=9cm,
+        minimum height=1.3cm,
+        align=center
+    ] {
+        \Large\bfseries\color{Navy}
+        Compare \quad $\bullet$ \quad Evaluate \quad $\bullet$ \quad Manage
+    };
+\end{tikzpicture}
+
+\vspace{1.8cm}
+
+\begin{tcolorbox}[
+    width=0.82\textwidth,
+    colback=LightGray,
+    colframe=MidGray,
+    boxrule=0.6pt,
+    arc=3mm,
+    left=6mm,
+    right=6mm,
+    top=5mm,
+    bottom=5mm
+]
+
+\begin{tabularx}{\linewidth}{@{}lY@{}}
+    \textbf{Candidate} & Rishabh \\[5pt]
+    \textbf{Repository} &
+    \url{https://github.com/CodingEnthusiastic/AutoCover} \\[5pt]
+    \textbf{Technology Stack} &
+    React, TypeScript, Python, FastAPI, SQLAlchemy \\[5pt]
+    \textbf{Reference Date} &
+    10 November 2026 (IST) \\[5pt]
+    \textbf{Report Generated} &
+    \today
+\end{tabularx}
+
+\end{tcolorbox}
+
+\vfill
+
+{\color{Accent}\rule{0.85\textwidth}{2pt}}
+
+\vspace{0.3cm}
+
+{\small\color{Slate}
+Engineering documentation covering architecture, data ingestion,
+normalization, recommendation logic, persistence, testing, and deployment.
+}
+
+\end{center}
+
+\end{titlepage}
+
+% ============================================================
+% ABSTRACT
+% ============================================================
 
 \begin{abstract}
-Vehicle insurance comparison in fragmented markets requires motorists to navigate multiple opaque portals, repeatedly re-enter regulatory specifications, and decipher incompatible marketing terminology. This technical report presents \textbf{AutoCover}, an end-to-end car insurance aggregation platform built with \textbf{React 18}, \textbf{TypeScript}, \textbf{Python 3.12}, \textbf{FastAPI}, and \textbf{SQLAlchemy}. AutoCover ingests raw quote data from four heterogeneous sources (JSON REST API, JavaScript-hydrated HTML DOM, India Motor Tariff rate card PDF, and CSV exports), handles duplicate and malformed records, normalizes add-on terminology based on empirical research across four leading Indian insurers (Acko, HDFC ERGO, Digit, ICICI Lombard), isolates latency and service failures via non-blocking asynchronous aggregation, computes multi-dimensional value scores, and delivers policy lifecycle tracking with automated renewal reminders.
+
+Vehicle insurance comparison often requires customers to navigate
+multiple portals, repeatedly enter vehicle information, and interpret
+inconsistent coverage terminology and pricing structures.
+
+\textbf{AutoCover} addresses this problem through an end-to-end car
+insurance aggregation, comparison, and policy lifecycle platform.
+
+Built using \textbf{React 18}, \textbf{TypeScript}, \textbf{Python 3.12},
+\textbf{FastAPI}, and \textbf{SQLAlchemy}, the application accepts a
+vehicle registration number and aggregates quotes from four simulated
+insurance providers. Each provider represents a different data source:
+a JSON REST API, a JavaScript-hydrated HTML page, a PDF tariff rate card,
+and a CSV export.
+
+The platform implements provider-specific parsing, duplicate detection,
+malformed-data handling, premium and GST normalization, canonical
+add-on mapping, multi-dimensional plan scoring, and asynchronous
+aggregation. It also provides vehicle verification, policy record
+management, and renewal tracking.
+
+This report documents the system architecture, provider integration
+strategies, data normalization methodology, recommendation engine,
+database structure, automated testing, and local execution procedure.
+
 \end{abstract}
 
 \tableofcontents
-\vspace{1.5em}
-\hrule
-\vspace{1.5em}
+
+\newpage
+
+% ============================================================
+% 1. EXECUTIVE SUMMARY
+% ============================================================
 
 \section{Executive Summary}
 
-AutoCover solves the friction of car insurance discovery through an intuitive, customer-centric architecture:
-\begin{enumerate}[leftmargin=1.5em]
-    \item \textbf{Single-Entry Lookup:} The user enters their vehicle registration number once. The system standardizes casing, spacing, and punctuation, retrieves verified specifications from the vehicle registry, and enables manual overrides if registered records differ from the registration certificate (RC).
-    \item \textbf{Concurrent Multi-Provider Ingestion:} Queries four distinct simulated provider services concurrently. Handles a intentionally slow provider (Provider B, $\sim$1.5s simulated latency) and an intermittently failing provider (Provider D, HTTP 503 simulation) without blocking other providers.
-    \item \textbf{Data Normalization \& Rate Modeling:} Standardizes diverse pricing schemas (tax-inclusive vs net base + 18\% GST), parses hydrated script states from HTML, executes dynamic underwriting tariff calculations from PDF rate cards, and cleans malformed CSV exports.
-    \item \textbf{Transparent Value Scoring:} Implements a multi-factor recommendation algorithm (0--100) scoring IDV protection efficiency, bundled add-on depth, and active validity, assigning \textit{Best Value}, \textit{Lowest Price}, and \textit{Maximum Coverage} badges.
-    \item \textbf{Policy Management \& Expiry Reminders:} Persists mock policy selections and proactively flags policies approaching expiration within 15 days, providing simulated WhatsApp/SMS renewal alerts.
+AutoCover simplifies the vehicle insurance discovery process through
+a unified comparison and policy management workflow.
+
+Instead of requiring customers to visit multiple provider interfaces,
+the platform collects and standardizes quote information through a
+single vehicle lookup.
+
+The major capabilities are summarized below.
+
+\begin{enumerate}
+
+    \item \textbf{Single-Entry Vehicle Lookup}
+
+    Customers enter their vehicle registration number once.
+    AutoCover normalizes registration formats, retrieves vehicle
+    specifications from its vehicle registry, and allows manual
+    verification or overrides when the registered information differs
+    from the vehicle's Registration Certificate (RC).
+
+    \item \textbf{Concurrent Multi-Provider Aggregation}
+
+    The backend communicates with four simulated providers concurrently.
+    Provider B introduces approximately 1.5 seconds of simulated latency,
+    while Provider D can return intermittent HTTP 503 responses.
+    Provider failures are isolated so that available responses from
+    other providers can still be processed.
+
+    \item \textbf{Heterogeneous Data Ingestion}
+
+    Each provider uses a different data representation.
+    AutoCover handles JSON, hydrated HTML, PDF-based tariff calculations,
+    and CSV exports through dedicated parsing and processing logic.
+
+    \item \textbf{Canonical Add-on Normalization}
+
+    Provider-specific marketing terminology is mapped into a common
+    add-on taxonomy, allowing customers to compare equivalent coverage
+    concepts across providers.
+
+    \item \textbf{Transparent Value Scoring}
+
+    Plans are evaluated using price affordability, Insured Declared Value
+    (IDV), add-on protection depth, and quote validity.
+
+    \item \textbf{Policy Lifecycle Management}
+
+    Selected policies are persisted in the database with vehicle,
+    customer, premium, coverage, and expiry details. The system supports
+    policy tracking and simulated renewal reminder workflows.
+
 \end{enumerate}
+
+\begin{infobox}[title={Core Engineering Objective}]
+AutoCover demonstrates how heterogeneous insurance quote sources
+can be transformed into a unified comparison experience using
+provider-specific parsers, asynchronous aggregation, canonical
+normalization, and transparent recommendation logic.
+\end{infobox}
+
+% ============================================================
+% 2. TECHNOLOGY STACK
+% ============================================================
+
+\section{Technology Stack}
+
+The application follows a decoupled frontend and backend architecture.
+
+\begin{table}[H]
+\centering
+\caption{Technology Stack}
+\begin{tabularx}{\textwidth}{L{3.2cm}L{3.5cm}Y}
+\toprule
+\textbf{Layer} & \textbf{Technology} & \textbf{Purpose} \\
+\midrule
+
+Frontend &
+React 18, TypeScript &
+Interactive vehicle lookup, quote comparison, filtering,
+policy dashboard, and user interface. \\
+
+Styling &
+Tailwind CSS &
+Responsive layouts and reusable interface styling. \\
+
+Icons &
+Lucide Icons &
+Consistent interface icons and visual indicators. \\
+
+Build Tool &
+Vite &
+Frontend development server and production build. \\
+
+Backend &
+Python 3.12, FastAPI &
+REST API, business logic, provider orchestration,
+and application services. \\
+
+Data Validation &
+Pydantic V2 &
+Request and response validation. \\
+
+Asynchronous Processing &
+asyncio, httpx &
+Concurrent provider requests and non-blocking aggregation. \\
+
+HTML Parsing &
+BeautifulSoup &
+Extraction of quote information from provider HTML. \\
+
+Persistence &
+SQLAlchemy ORM &
+Database models and persistence operations. \\
+
+Database &
+SQLite / PostgreSQL &
+Local zero-dependency execution with optional PostgreSQL support. \\
+
+Testing &
+pytest &
+Automated API, parser, service, and aggregation tests. \\
+
+\bottomrule
+\end{tabularx}
+\end{table}
+
+% ============================================================
+% 3. SYSTEM ARCHITECTURE
+% ============================================================
 
 \section{High-Level System Architecture}
 
 \subsection{Architecture Overview}
-The platform employs a decoupled micro-service layout:
-\begin{itemize}[leftmargin=1.5em]
-    \item \textbf{Frontend Application:} React 18, TypeScript, Tailwind CSS, Lucide icons, and Vite.
-    \item \textbf{Backend REST API:} Python 3.12, FastAPI, Pydantic V2, and Uvicorn.
-    \item \textbf{Persistence Layer:} SQLAlchemy ORM with SQLite for zero-dependency local execution and native PostgreSQL support via environment variable configuration.
-    \item \textbf{Provider Simulation Suite:} Dedicated endpoints serving JSON, HTML, PDF, and CSV payloads with latency and fault-injection controls.
+
+AutoCover separates the customer-facing interface, API layer,
+aggregation engine, provider-specific integrations, normalization
+services, and persistence layer.
+
+The major processing sequence is:
+
+\begin{enumerate}
+    \item The customer enters a vehicle registration number.
+    \item The React frontend sends the lookup request to FastAPI.
+    \item The backend retrieves the vehicle profile and relevant
+    vehicle details.
+    \item The asynchronous aggregator dispatches requests to the
+    four simulated providers.
+    \item Provider-specific drivers parse the returned data.
+    \item The normalization layer standardizes premiums, IDV,
+    validity, and add-on terminology.
+    \item The ranking engine computes value scores and recommendation
+    badges.
+    \item The frontend receives a unified comparison response.
+    \item Selected policies can be persisted for lifecycle tracking.
+\end{enumerate}
+
+\subsection{System Architecture Diagram}
+
+\begin{figure}[H]
+\centering
+
+\begin{tikzpicture}[
+    >=Latex,
+    node distance=9mm,
+    main/.style={
+        draw=Navy,
+        fill=LightBlue,
+        rounded corners=3pt,
+        line width=0.9pt,
+        text width=8cm,
+        align=center,
+        minimum height=0.9cm,
+        inner sep=6pt,
+        font=\small
+    },
+    provider/.style={
+        draw=Teal,
+        fill=LightTeal,
+        rounded corners=3pt,
+        line width=0.8pt,
+        text width=2.8cm,
+        minimum height=1.2cm,
+        align=center,
+        inner sep=5pt,
+        font=\footnotesize
+    },
+    store/.style={
+        draw=Orange,
+        fill=Orange!5,
+        rounded corners=3pt,
+        line width=0.8pt,
+        text width=2.8cm,
+        minimum height=1cm,
+        align=center,
+        inner sep=5pt,
+        font=\footnotesize
+    },
+    arrow/.style={
+        ->,
+        line width=0.9pt,
+        draw=Slate
+    }
+]
+
+\node[main] (ui) at (0,0) {
+    \textbf{Customer Presentation Layer}\\
+    React 18 + TypeScript\\
+    Vehicle Lookup, Verification, Comparison UI
+};
+
+\node[main] (api) at (0,-1.55) {
+    \textbf{FastAPI Backend}\\
+    REST Endpoints, Request Validation, Business Logic
+};
+
+\node[main] (agg) at (0,-3.1) {
+    \textbf{Asynchronous Insurance Aggregator}\\
+    asyncio.gather + httpx.AsyncClient\\
+    Concurrent Dispatch and Failure Isolation
+};
+
+\node[provider] (pa) at (-5.1,-5.2) {
+    \textbf{Provider A}\\[2pt]
+    JSON REST API\\
+    Duplicate Detection
+};
+
+\node[provider] (pb) at (-1.7,-5.2) {
+    \textbf{Provider B}\\[2pt]
+    HTML + JS Hydration\\
+    $\sim$1.5s Latency
+};
+
+\node[provider] (pc) at (1.7,-5.2) {
+    \textbf{Provider C}\\[2pt]
+    PDF Tariff Rate Card\\
+    Dynamic Calculations
+};
+
+\node[provider] (pd) at (5.1,-5.2) {
+    \textbf{Provider D}\\[2pt]
+    CSV Export\\
+    503 Fault Simulation
+};
+
+\node[main] (norm) at (0,-7.1) {
+    \textbf{Data Normalization Layer}\\
+    Premium, GST, IDV, Validity, Add-on Mapping
+};
+
+\node[main] (rank) at (0,-8.65) {
+    \textbf{Value Scoring and Recommendation Engine}\\
+    Multi-factor Ranking, Best Value, Lowest Price,
+    Maximum Coverage
+};
+
+\node[store] (db) at (6.2,-1.55) {
+    \textbf{Persistence Layer}\\
+    SQLAlchemy ORM\\
+    SQLite / PostgreSQL
+};
+
+\draw[arrow] (ui) -- (api);
+\draw[arrow] (api) -- (agg);
+
+\draw[arrow] (api.east) -- (db.west)
+    node[midway,above,font=\scriptsize,text=Slate] {Persistence};
+
+\draw[arrow] (agg.south) -- (pa.north);
+\draw[arrow] (agg.south) -- (pb.north);
+\draw[arrow] (agg.south) -- (pc.north);
+\draw[arrow] (agg.south) -- (pd.north);
+
+\draw[arrow] (pa.south) -- (norm.north);
+\draw[arrow] (pb.south) -- (norm.north);
+\draw[arrow] (pc.south) -- (norm.north);
+\draw[arrow] (pd.south) -- (norm.north);
+
+\draw[arrow] (norm) -- (rank);
+
+\draw[
+    ->,
+    dashed,
+    draw=Blue,
+    line width=0.9pt,
+    bend right=35
+]
+(rank.west) to node[left,font=\scriptsize,text=Blue,align=center]
+{Unified\\Comparison\\Response} (ui.west);
+
+\end{tikzpicture}
+
+\caption{AutoCover end-to-end system architecture}
+\label{fig:architecture}
+
+\end{figure}
+
+\subsection{Major Architectural Components}
+
+\begin{table}[H]
+\centering
+\caption{Component Responsibilities}
+\begin{tabularx}{\textwidth}{L{4cm}Y}
+\toprule
+\textbf{Component} & \textbf{Responsibility} \\
+\midrule
+
+Frontend Presentation &
+Collects vehicle registration details and displays normalized
+insurance quotes, recommendation badges, comparisons, and
+policy records. \\
+
+FastAPI Backend &
+Provides the application API and coordinates vehicle lookup,
+provider aggregation, validation, and persistence. \\
+
+Async Aggregator &
+Dispatches provider requests concurrently and isolates individual
+provider failures. \\
+
+Provider Drivers &
+Implement format-specific extraction and processing for JSON,
+HTML, PDF-based tariff information, and CSV data. \\
+
+Normalizer &
+Standardizes inconsistent pricing, IDV representations,
+quote validity, and provider add-on names. \\
+
+Ranking Engine &
+Calculates multi-dimensional plan scores and assigns
+recommendation badges. \\
+
+Persistence Layer &
+Stores customer policy details and manually overridden
+vehicle specifications. \\
+
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Excalidraw Architecture Artifact}
+
+A separate editable architecture diagram is maintained in the
+repository as:
+
+\begin{center}
+\colorbox{CodeBg}{
+    \texttt{architecture.excalidraw}
+}
+\end{center}
+
+The file can be opened or edited using
+\href{https://excalidraw.com}{Excalidraw}.
+
+% ============================================================
+% 4. DATA SOURCE INVESTIGATION
+% ============================================================
+
+\section{Heterogeneous Data Ingestion and Integration}
+
+Each simulated provider represents a different source format and
+requires a dedicated extraction strategy.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Provider Integration Overview}
+\begin{tabularx}{\textwidth}{L{2.2cm}L{3.1cm}Y}
+\toprule
+\textbf{Provider} &
+\textbf{Format} &
+\textbf{Characteristics and Handling} \\
+\midrule
+
+\textbf{A} &
+JSON REST API &
+Contains active quotes, underwriting declines, duplicate
+records, add-on codes, and different premium tax representations. \\
+
+\textbf{B} &
+Hydrated HTML &
+Contains static DOM cards with dynamically populated pricing
+and coverage values stored in an embedded JavaScript state object.
+Introduces approximately 1.5 seconds of latency. \\
+
+\textbf{C} &
+PDF Rate Card &
+Provides a tariff structure rather than static quotes.
+Premiums are calculated dynamically using depreciation,
+vehicle model groups, engine capacity, and NCB rules. \\
+
+\textbf{D} &
+CSV Export &
+Contains inconsistent registration formats, currency formatting,
+mixed IDV representations, duplicate records, expired quotes,
+and simulated HTTP 503 failures. \\
+
+\bottomrule
+\end{tabularx}
+\end{table}
+
+% ------------------------------------------------------------
+% PROVIDER A
+% ------------------------------------------------------------
+
+\subsection{Provider A: JSON REST API}
+
+\textbf{Source File:} \texttt{provider\_a.json}
+
+Provider A exposes quote information through a structured JSON
+representation.
+
+The implementation handles the following cases:
+
+\begin{itemize}
+
+    \item \textbf{Duplicate Quote Detection:}
+    Duplicate quote records are identified using a composite
+    key containing plan, coverage, IDV, premium, and add-ons.
+
+    For example, duplicate quote entries for
+    \texttt{WB02AB1234} are detected and consolidated.
+
+    \item \textbf{Premium Tax Isolation:}
+    Some records contain a base premium with a separate tax structure,
+    while others provide an inclusive premium with a
+    \texttt{premium\_includes\_gst} indicator.
+
+    These representations are normalized into a common
+    base-premium and GST structure.
+
+    \item \textbf{Quote Validity:}
+    Quote expiry dates are evaluated against the configured
+    reference date of 10 November 2026.
+
+    \item \textbf{Underwriting Declines:}
+    Declined quotes are preserved with their rejection reasons
+    instead of being silently discarded.
+
 \end{itemize}
 
-\subsection{Excalidraw Architecture Specification}
-To facilitate collaborative whiteboard analysis, a high-level system architecture was constructed in \textbf{Excalidraw} format. The complete drawing is persisted in the repository as \texttt{architecture.excalidraw}.
+For example, vehicle \texttt{WB06CD5678} has an underwriting
+decline associated with vehicle age exceeding ten years.
 
-\begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,title=\textbf{Excalidraw Architecture Structure (\texttt{architecture.excalidraw})}]
-The Excalidraw visual document defines the complete end-to-end data pipeline across eight interconnected layers:
-\begin{enumerate}[leftmargin=1.2em]
-    \item \textbf{Client Presentation Layer:} Customer inputs registration $\to$ Interactive comparison grid with filter controls and side-by-side modal.
-    \item \textbf{FastAPI Gateway:} Entry controllers routing \texttt{/vehicles}, \texttt{/quotes}, and \texttt{/policies}.
-    \item \textbf{Async Non-Blocking Aggregator:} Concurrently orchestrates four provider requests via \texttt{asyncio.gather} and \texttt{httpx.AsyncClient}.
-    \item \textbf{Provider Drivers:}
-    \begin{itemize}
-        \item \textit{Provider A Driver:} JSON parser + quote deduplicator.
-        \item \textit{Provider B Driver:} HTML DOM + JavaScript \texttt{window.\_\_QUOTE\_DATA\_\_} state hydrator ($\sim$1.5s latency).
-        \item \textit{Provider C Driver:} India Motor Tariff PDF rate card underwriting engine.
-        \item \textit{Provider D Driver:} CSV row parser with 503 gateway timeout circuit-breaking.
-    \end{itemize}
-    \item \textbf{Canonical Add-on Normalizer:} Maps aliases to canonical taxonomy.
-    \item \textbf{Value Scoring \& Badging Engine:} Computes 0--100 ranking.
-    \item \textbf{Persistence Engine:} SQLAlchemy ORM managing \texttt{policies} and \texttt{vehicle\_overrides}.
-    \item \textbf{Automated Expiry Monitor:} Flags policies within 15 days of reference date (\texttt{2026-11-10}) and dispatches simulated reminders.
-\end{enumerate}
-\end{tcolorbox}
+% ------------------------------------------------------------
+% PROVIDER B
+% ------------------------------------------------------------
 
-\begin{lstlisting}[language=json,caption={Excalidraw Scene JSON Excerpt (\texttt{architecture.excalidraw})}]
-{
-  "type": "excalidraw",
-  "version": 2,
-  "source": "https://excalidraw.com",
-  "elements": [
-    {
-      "id": "box_frontend",
-      "type": "rectangle",
-      "x": 50, "y": 110, "width": 240, "height": 110,
-      "strokeColor": "#0f172a", "backgroundColor": "#f8fafc",
-      "text": "React 18 + TypeScript UI\n- Plate Lookup & Verification\n- Plan Cards & Value Badges"
-    },
-    {
-      "id": "box_aggregator",
-      "type": "rectangle",
-      "x": 320, "y": 290, "width": 440, "height": 80,
-      "strokeColor": "#9333ea", "backgroundColor": "#faf5ff",
-      "text": "Async Insurance Aggregator (asyncio.gather)\nConcurrent Non-blocking Dispatch & Timeout Isolation"
+\subsection{Provider B: HTML with JavaScript Hydration}
+
+\textbf{Source File:} \texttt{provider\_b.html}
+
+Provider B represents a common modern web integration challenge:
+the static HTML contains the structure of the quote cards, but
+the actual pricing information is populated through JavaScript.
+
+An example of the embedded state is:
+
+\begin{lstlisting}[language=javascript,caption={Example of Provider B hydrated quote data}]
+window.__QUOTE_DATA__ = {
+    "B-101": {
+        "total": "INR 12,830",
+        "cover": "3.1 L",
+        "valid_till": "30-11-2026"
     }
-  ]
-}
+};
 \end{lstlisting}
 
-\section{Heterogeneous Data Ingestion \& Normalization}
+The extraction process follows these steps:
 
-\subsection{Provider A: REST API (JSON)}
-\begin{itemize}[leftmargin=1.2em]
-    \item \textbf{Source:} \texttt{provider\_a.json}
-    \item \textbf{Deduplication:} Duplicate quotes (e.g. quote indices 1 and 2 for \texttt{WB02AB1234 Comprehensive Plus}) are identified by composite key: \texttt{(plan, coverage, idv, premium, addons)}.
-    \item \textbf{Tax Isolation:} Some quotes specify \texttt{base\_premium} with a tax structure, while others specify \texttt{premium} with \texttt{premium\_includes\_gst: true}. Both are normalized into base premium and 18\% GST.
-    \item \textbf{Quote Validity:} Assessed against the reference date (\texttt{2026-11-10}). Quotes for \texttt{KL07DE3030} valid until \texttt{2026-11-05} are flagged as \texttt{EXPIRED}.
-    \item \textbf{Underwriting Declines:} Quotes with \texttt{status: "DECLINED"} (e.g. \texttt{WB06CD5678} due to age $>10$ years) are preserved and surfaced with explicit reasons.
-\end{itemize}
+\begin{enumerate}
 
-\subsection{Provider B: Webpage with JS Hydration (HTML)}
-\begin{itemize}[leftmargin=1.2em]
-    \item \textbf{Source:} \texttt{provider\_b.html}
-    \item \textbf{DOM vs Script State:} Plan titles and add-on lists are in static HTML, but prices and cover amounts are dynamically hydrated from an inline script:
-    \begin{lstlisting}[language=javascript]
-    window.__QUOTE_DATA__ = {
-      "B-101": {"total": "INR 12,830", "cover": "3.1 L", "valid_till": "30-11-2026"}
-    };
-    \end{lstlisting}
-    \item \textbf{Data Extraction:} Uses regular expressions to extract the JSON dictionary and \texttt{BeautifulSoup} to parse DOM cards.
-    \item \textbf{IDV Conversion:} Strings like \texttt{"3.1 L"} or \texttt{"12.5 L"} are converted to integer Rupee values ($310,000$ and $1,250,000$).
-    \item \textbf{Latency Simulation:} A sleep delay of 1.5 seconds is injected to replicate an external slow provider.
-\end{itemize}
+    \item Parse the HTML document and identify the quote cards
+    using BeautifulSoup.
 
-\subsection{Provider C: Rate Card Tariff (PDF)}
-\begin{itemize}[leftmargin=1.2em]
-    \item \textbf{Source:} \texttt{provider\_c.pdf}
-    \item \textbf{Underwriting Engine:} Rather than returning static quotes, Provider C defines a complete mathematical tariff following the \textbf{India Motor Tariff}:
-    \begin{equation}
-    \text{IDV} = \text{Ex-Showroom Price} \times (1 - \text{Depreciation}(\text{Age}))
-    \end{equation}
-    \item \textbf{Depreciation Tiers:} $\le 6$ months: 5\%; 6m--1y: 15\%; 1--2y: 20\%; 2--3y: 30\%; 3--4y: 40\%; 4--5y: 50\%; 5--8y: $50\% + 5\% \times (\text{years} - 5)$; $>8$ years: \textbf{Declined}.
-    \item \textbf{Model Grouping:} Group 1 (Swift, i20, Baleno, Alto K10, Tiago), Group 2 (Nexon, City, Sonet), Group 3 (Creta, XUV700, Innova Crysta).
-    \item \textbf{OD \& TP Premiums:} Own Damage rate applied to IDV, discounted by No Claim Bonus (NCB). Third Party rate determined by cubic capacity ($\le 1000$cc: ₹2,094; $1000$--$1500$cc: ₹3,416; $>1500$cc: ₹7,897).
-    \item \textbf{Eligibility Rules:} \texttt{C-Standard} is available up to 8 years. \texttt{C-Shield} (Nil Dep + RSA + Consumables) is restricted to vehicles $\le 5$ years.
-\end{itemize}
+    \item Extract the embedded
+    \texttt{window.\_\_QUOTE\_DATA\_\_} JavaScript state.
 
-\subsection{Provider D: Quote Export (CSV) \& Fault Injection}
-\begin{itemize}[leftmargin=1.2em]
-    \item \textbf{Source:} \texttt{provider\_d.csv}
-    \item \textbf{Dirty Data Cleaning:} Strips comma formatting from currency strings (\texttt{"11,670"} $\to 11670.0$), normalizes mixed IDV representations (\texttt{"3.3 lakh"} vs \texttt{332000}), and deduplicates duplicate rows (\texttt{KL 07 DE 3030 Gold} plan repeated).
-    \item \textbf{Fault Tolerance:} Implements an on-demand and stochastic 503 Service Unavailable simulation. The aggregator isolates the failure, allowing the remaining providers to display without interruption, while surfacing a 1-click retry action.
-\end{itemize}
+    \item Decode the JSON data stored within the script.
 
-\section{Add-on Normalization \& Public Insurer Research}
+    \item Match the extracted pricing and coverage information
+    with the corresponding HTML quote cards.
 
-To normalize arbitrary provider terminology into industry-standard concepts, we researched public add-on pages across four major Indian insurers:
-\begin{enumerate}[leftmargin=1.5em]
-    \item \textbf{Acko General Insurance:} \url{https://www.acko.com/car-insurance/add-on-covers/}
-    \item \textbf{HDFC ERGO General Insurance:} \url{https://www.hdfcergo.com/car-insurance/add-on-covers}
-    \item \textbf{Digit Insurance:} \url{https://www.godigit.com/motor-insurance/car-insurance/add-ons}
-    \item \textbf{ICICI Lombard:} \url{https://www.icicilombard.com/motor-insurance/car-insurance/add-on-covers}
+    \item Convert Lakhs-formatted IDV values into integer
+    Rupee values.
+
 \end{enumerate}
+
+For example:
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Input Representation} & \textbf{Normalized Value} \\
+\midrule
+\texttt{3.1 L} & ₹3,10,000 \\
+\texttt{12.5 L} & ₹12,50,000 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+A simulated delay of approximately 1.5 seconds is introduced
+to represent a slower external provider.
+
+% ------------------------------------------------------------
+% PROVIDER C
+% ------------------------------------------------------------
+
+\subsection{Provider C: PDF Tariff Rate Card}
+
+\textbf{Source File:} \texttt{provider\_c.pdf}
+
+Unlike the other providers, Provider C does not simply return
+pre-existing static quotes. It supplies tariff information that
+is used by the backend to calculate quotes dynamically.
+
+The calculation follows the documented tariff structure.
+
+\subsubsection{Insured Declared Value Calculation}
+
+The basic IDV calculation is:
+
+\[
+\boxed{
+\text{IDV}
+=
+\text{Ex-Showroom Price}
+\times
+(1-\text{Depreciation})
+}
+\]
+
+The depreciation percentage depends on the vehicle's age.
+
+\begin{table}[H]
+\centering
+\caption{Provider C Depreciation Tiers}
+\begin{tabular}{@{}lc@{}}
+\toprule
+\textbf{Vehicle Age} & \textbf{Depreciation} \\
+\midrule
+Up to 6 months & 5\% \\
+6 months to 1 year & 15\% \\
+1 to 2 years & 20\% \\
+2 to 3 years & 30\% \\
+3 to 4 years & 40\% \\
+4 to 5 years & 50\% \\
+5 to 8 years & 50\% + 5\% per additional year after 5 years \\
+More than 8 years & Declined \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Third-Party Premium Calculation}
+
+Third-party premiums are determined by engine capacity.
+
+\begin{table}[H]
+\centering
+\caption{Engine Capacity-Based Third-Party Rates}
+\begin{tabular}{@{}lc@{}}
+\toprule
+\textbf{Engine Capacity} & \textbf{Third-Party Premium} \\
+\midrule
+Up to 1000 cc & ₹2,094 \\
+1000--1500 cc & ₹3,416 \\
+Above 1500 cc & ₹7,897 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Additional Underwriting Rules}
+
+Provider C also considers:
+
+\begin{itemize}
+    \item Vehicle model group classification.
+    \item Own Damage premium rates.
+    \item No Claim Bonus discounts.
+    \item Vehicle eligibility for specific insurance plans.
+    \item Add-on eligibility based on vehicle age.
+\end{itemize}
+
+The documented model grouping is:
+
+\begin{table}[H]
+\centering
+\caption{Provider C Vehicle Model Groups}
+\begin{tabularx}{\textwidth}{L{2.2cm}Y}
+\toprule
+\textbf{Group} & \textbf{Vehicle Models} \\
+\midrule
+Group 1 & Swift, i20, Baleno, Alto K10, Tiago \\
+Group 2 & Nexon, City, Sonet \\
+Group 3 & Creta, XUV700, Innova Crysta \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The available plans include:
+
+\begin{itemize}
+    \item \textbf{C-Standard:} Available for vehicles up to
+    eight years old.
+    \item \textbf{C-Shield:} Includes Nil Depreciation,
+    Roadside Assistance, and Consumables; restricted to
+    vehicles up to five years old.
+\end{itemize}
+
+IDV values are rounded to the nearest ₹1,000 using the documented
+rounding approach, while premiums are rounded to the nearest rupee.
+
+% ------------------------------------------------------------
+% PROVIDER D
+% ------------------------------------------------------------
+
+\subsection{Provider D: CSV Export and Fault Injection}
+
+\textbf{Source File:} \texttt{provider\_d.csv}
+
+Provider D represents a legacy export-based integration where
+the returned data may contain inconsistent formatting and
+intermittent service failures.
+
+The parser handles the following data quality cases:
+
+\begin{table}[H]
+\centering
+\caption{Provider D Data Cleaning Examples}
+\begin{tabularx}{\textwidth}{Y Y}
+\toprule
+\textbf{Raw Data} & \textbf{Normalized Data} \\
+\midrule
+\texttt{"11,670"} & Numeric premium: 11670.0 \\
+\texttt{"3.3 lakh"} & Numeric IDV representation \\
+\texttt{"332000"} & Numeric IDV representation \\
+\texttt{"Zero Dep|RSA"} & Standardized add-on collection \\
+\texttt{"KL 07 DE 3030"} & Normalized registration number \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The implementation also handles:
+
+\begin{itemize}
+    \item Duplicate CSV records, including repeated
+    \texttt{KL 07 DE 3030 Gold} entries.
+    \item Expired quotes, including records dated
+    15 October 2026.
+    \item Inconsistent currency and IDV representations.
+    \item Pipe-delimited add-on values.
+    \item Simulated intermittent HTTP 503 responses.
+\end{itemize}
+
+\begin{warningbox}[title={Fault Tolerance}]
+Provider D's simulated service failure is isolated from the
+other provider integrations. Available provider responses can
+still be processed, and the frontend exposes a retry mechanism
+for the failed provider.
+\end{warningbox}
+
+% ============================================================
+% 5. NORMALIZATION AND RESEARCH
+% ============================================================
+
+\section{Add-on Normalization and Insurer Research}
+
+Insurance providers frequently use different marketing names
+for similar coverage concepts.
+
+For example, one insurer may use ``Bumper-to-Bumper'', another
+may use ``Nil Depreciation'', while another may simply use
+``Zero Dep''.
+
+Comparing these labels directly would lead to inconsistent
+results. AutoCover therefore maps provider-specific terminology
+into a canonical add-on taxonomy.
+
+\subsection{Public Insurer Research}
+
+The normalization approach is informed by public add-on
+documentation from four Indian general insurance providers.
+
+\begin{enumerate}
+
+    \item \textbf{Acko General Insurance}
+
+    Source:
+    \url{https://www.acko.com/car-insurance/add-on-covers/}
+
+    Reviewed terms include Zero Depreciation Cover,
+    Roadside Assistance, Engine Protection Cover,
+    Key Protect, Invoice Cover, and Consumables Cover.
+
+    \item \textbf{HDFC ERGO General Insurance}
+
+    Source:
+    \url{https://www.hdfcergo.com/car-insurance/add-on-covers}
+
+    Reviewed terms include Zero Depreciation,
+    Emergency Assistance Cover, Engine and Gearbox Protector,
+    Cost of Consumables, and Return to Invoice.
+
+    \item \textbf{Digit Insurance}
+
+    Source:
+    \url{https://www.godigit.com/motor-insurance/car-insurance/add-ons}
+
+    Reviewed terms include Bumper-to-Bumper Cover,
+    Breakdown Assistance, Engine and Gearbox Protection,
+    and Return to Invoice.
+
+    \item \textbf{ICICI Lombard General Insurance}
+
+    Source:
+    \url{https://www.icicilombard.com/motor-insurance/car-insurance/add-on-covers}
+
+    Reviewed terms include Nil Depreciation,
+    Roadside Assistance, Key Protect, and Engine Protect Plus.
+
+\end{enumerate}
+
+\subsection{Canonical Add-on Mapping Matrix}
+
+The following mapping illustrates how the application translates
+provider-specific names into standardized coverage concepts.
 
 \begin{table}[H]
 \centering
 \small
 \caption{Canonical Add-on Normalization Matrix}
-\begin{tabular}{@{}llll@{}}
+\begin{tabularx}{\textwidth}{L{2.4cm}L{3.0cm}YYYY}
 \toprule
-\textbf{Canonical Code} & \textbf{Standard Display Name} & \textbf{Observed Raw Provider Terms} & \textbf{Coverage Scope} \\ \midrule
-\texttt{ZERO\_DEP} & Zero Depreciation & Bumper to Bumper, Nil Dep, Zero Dep & 100\% parts replacement cost without deduction \\
-\texttt{RSA} & Roadside Assistance & 24x7 RSA, Roadside Support & Towing, puncture, jump start, emergency fuel \\
-\texttt{ENGINE\_PROTECT} & Engine Protection & Engine \& Gearbox Protection & Hydrostatic lock and lubricant leakage damage \\
-\texttt{RETURN\_TO\_INVOICE} & Return to Invoice & Total Cover, Return to Invoice & Bridges gap between IDV and original invoice \\
-\texttt{CONSUMABLES} & Consumables Cover & Consumables, Cost of Consumables & Nuts, bolts, washers, engine oil, and fluids \\
-\texttt{KEY\_REPLACEMENT} & Key Replacement & Key Replacement, Key Protect & Stolen/lost key and lock-set reimbursement \\ \bottomrule
-\end{tabular}
+\textbf{Canonical Code} &
+\textbf{Display Name} &
+\textbf{Provider A} &
+\textbf{Provider B} &
+\textbf{Provider C} &
+\textbf{Provider D} \\
+\midrule
+
+\texttt{ZERO\_DEP} &
+Zero Depreciation &
+\texttt{ZERO\_DEP} &
+Bumper to Bumper &
+Nil Depreciation &
+Zero Dep \\
+
+\texttt{RSA} &
+Roadside Assistance &
+\texttt{RSA} &
+24x7 Roadside Assistance &
+Roadside Assistance &
+RSA \\
+
+\texttt{ENGINE\_PROTECT} &
+Engine and Gearbox Protection &
+-- &
+Engine and Gearbox Protection &
+Engine Protect &
+Engine Protect \\
+
+\texttt{RETURN\_TO\_INVOICE} &
+Return to Invoice &
+-- &
+Total Cover &
+Return to Invoice &
+-- \\
+
+\texttt{CONSUMABLES} &
+Consumables Cover &
+-- &
+-- &
+Consumables &
+-- \\
+
+\texttt{KEY\_REPLACEMENT} &
+Key Replacement &
+-- &
+Key Replacement &
+-- &
+-- \\
+
+\bottomrule
+\end{tabularx}
 \end{table}
 
-\section{Value Scoring \& Plan Recommendation}
+\subsection{Normalization Benefits}
 
-Rather than assuming the cheapest plan is best, AutoCover calculates a 0--100 composite score:
-\begin{equation}
-\text{Score} = S_{\text{price}} + S_{\text{idv}} + S_{\text{addons}} + S_{\text{validity}}
-\end{equation}
-\begin{itemize}[leftmargin=1.5em]
-    \item \textbf{Price Affordability ($S_{\text{price}} \in [0, 35]$):} Evaluated as $35 \times \left(1 - \frac{P - P_{\min}}{P_{\max} - P_{\min}}\right)$.
-    \item \textbf{IDV Protection ($S_{\text{idv}} \in [0, 30]$):} Evaluated as $30 \times \left(\frac{\text{IDV} - \text{IDV}_{\min}}{\text{IDV}_{\max} - \text{IDV}_{\min}}\right)$.
-    \item \textbf{Add-on Coverage Depth ($S_{\text{addons}} \in [0, 30]$):} Weighted credit: Zero Dep (+12 pts), Engine Protect (+7 pts), RSA (+5 pts), Return to Invoice (+4 pts), Consumables (+2 pts).
-    \item \textbf{Validity Bonus ($S_{\text{validity}} = 5$):} Granted to active quotes.
+The canonical taxonomy provides the following benefits:
+
+\begin{itemize}
+
+    \item Allows customers to compare equivalent add-on
+    coverage across providers.
+
+    \item Avoids treating different marketing terminology
+    as different insurance benefits.
+
+    \item Enables consistent add-on scoring in the
+    recommendation engine.
+
+    \item Provides a reusable structure for integrating
+    additional providers in the future.
+
 \end{itemize}
 
-\section{Screenshots of the Running Application}
+% ============================================================
+% 6. VALUE SCORING
+% ============================================================
 
-The figures below demonstrate the live, operational AutoCover platform.
+\section{Value Scoring and Plan Recommendation}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.92\linewidth]{screenshots/01_home_vehicle_lookup.png}
-    \caption{\textbf{Vehicle Lookup \& RC Verification:} Indian registration plate styling, quick-pick test customers, vehicle specification attributes, and dynamic 10-day policy expiration alert banner.}
-    \label{fig:lookup}
-\end{figure}
+AutoCover does not assume that the cheapest insurance plan
+is automatically the best choice.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.92\linewidth]{screenshots/02_quotes_comparison_grid.png}
-    \caption{\textbf{Quotes Comparison Grid:} Multi-provider status bar (Provider A, B, C, D), sorting and filter controls, plan cards with Value Score meters and badges (\textit{Best Value}, \textit{Lowest Price}, \textit{Maximum Coverage}).}
-    \label{fig:grid}
-\end{figure}
+Instead, it computes a composite Value Score ranging from
+0 to 100, considering both pricing and coverage quality.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.92\linewidth]{screenshots/03_side_by_side_modal.png}
-    \caption{\textbf{Side-by-Side Comparison Modal:} Detailed feature-by-feature matrix comparing IDV, net base premium, 18\% GST, total price, add-on inclusions, and quote validity dates.}
-    \label{fig:comparison}
-\end{figure}
+\[
+\boxed{
+\text{Value Score}
+=
+S_{\text{price}}
++
+S_{\text{IDV}}
++
+S_{\text{addons}}
++
+S_{\text{validity}}
+}
+\]
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.92\linewidth]{screenshots/04_policy_dashboard.png}
-    \caption{\textbf{Policy Portfolio Dashboard:} Saved policy records with vehicle associations, 15-day expiry badges, and simulated WhatsApp/SMS renewal notification triggers.}
-    \label{fig:policies}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.92\linewidth]{screenshots/05_addon_glossary.png}
-    \caption{\textbf{Add-on Glossary \& Research Citations:} Documentation of public insurer sources (Acko, HDFC ERGO, Digit, ICICI Lombard) with live links and canonical alias mappings.}
-    \label{fig:glossary}
-\end{figure}
-
-\section{Empirical Evaluation Matrix}
-
-AutoCover was validated against the reference date (\textbf{10 November 2026}) across all provided test customer profiles:
+\subsection{Scoring Components}
 
 \begin{table}[H]
 \centering
-\small
-\caption{Empirical Test Customer Verification Matrix}
-\begin{tabular}{@{}llcccl@{}}
+\caption{Value Score Distribution}
+\begin{tabularx}{\textwidth}{L{3.4cm}C{2cm}Y}
 \toprule
-\textbf{Registration} & \textbf{Vehicle} & \textbf{Avail.} & \textbf{Exp.} & \textbf{Decl.} & \textbf{Behavior Verified} \\ \midrule
-\texttt{WB02AB1234} & Maruti Swift VXi & 10 & 0 & 0 & Quoted across all 4 providers; expiring in 10 days. \\
-\texttt{KL07DE3030} & Maruti Swift ZXi & 7 & 3 & 0 & Provider A quotes expired on 05/11/2026; Prov D deduplicated. \\
-\texttt{MH12EF4321} & Tata Nexon XZ+ & 10 & 0 & 0 & Full coverage; diesel CC tariff properly calculated. \\
-\texttt{WB06CD5678} & Hyundai i20 Asta & 0 & 0 & 3 & Vehicle age $>10$ yrs; declined by Prov A, B, and C. \\
-\texttt{DL3CAB0042} & Hyundai Creta SX & 9 & 1 & 0 & 1 prior claim (0\% NCB); Prov D Basic quote expired. \\
-\texttt{WB02AB9999} & Custom Swift & 3 & 0 & 0 & Unregistered vehicle; fallback profile \& Prov C rate card. \\ \bottomrule
+\textbf{Component} &
+\textbf{Maximum Points} &
+\textbf{Evaluation Criteria} \\
+\midrule
+
+Price Affordability &
+35 &
+Normalized position of the quoted premium between the
+minimum and maximum available market premiums. \\
+
+IDV Coverage Strength &
+30 &
+Insured Declared Value relative to the vehicle's
+market ex-showroom valuation. \\
+
+Add-on Protection Depth &
+30 &
+Weighted credits based on the availability of
+important additional coverage. \\
+
+Validity and Reliability &
+5 &
+Bonus for quotes that remain valid on the configured
+reference date. \\
+
+\midrule
+\textbf{Total} & \textbf{100} & \textbf{Composite Value Score} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Add-on Protection Weights}
+
+The documented add-on scoring weights are:
+
+\begin{table}[H]
+\centering
+\caption{Add-on Coverage Scoring}
+\begin{tabular}{@{}lc@{}}
+\toprule
+\textbf{Add-on} & \textbf{Score Credit} \\
+\midrule
+Zero Depreciation & +12 points \\
+Engine and Gearbox Protection & +7 points \\
+Roadside Assistance & +5 points \\
+Return to Invoice & +4 points \\
+Consumables Cover & +2 points \\
+\bottomrule
 \end{tabular}
 \end{table}
 
-\section{Appendix: Setup \& LaTeX Compilation}
+\subsection{Recommendation Badges}
 
-\subsection{Running the Code Locally}
-\begin{lstlisting}[language=bash]
-# 1. Backend setup & tests
-cd backend
-pip install -r requirements.txt
-python -m pytest -v          # All 14 tests pass
-python verify_system.py     # End-to-end execution verification
-python -m uvicorn main:app --port 8000
+The application highlights three important recommendation
+categories.
 
-# 2. Frontend setup
-cd frontend
-npm install
-npm run dev                 # Open http://localhost:5173
+\begin{successbox}[title={Best Value}]
+Identifies the plan with the highest composite score,
+balancing price affordability and coverage depth.
+\end{successbox}
+
+\begin{infobox}[title={Lowest Price}]
+Identifies the plan with the minimum net premium,
+helping budget-conscious customers identify the
+least expensive available option.
+\end{infobox}
+
+\begin{tcolorbox}[
+    colback=Orange!5,
+    colframe=Orange,
+    boxrule=0.7pt,
+    arc=2mm,
+    title=\textbf{Maximum Coverage}
+]
+Highlights plans offering the strongest combination of
+IDV and bundled add-on protection.
+\end{tcolorbox}
+
+% ============================================================
+% 7. APPLICATION WORKFLOW
+% ============================================================
+
+\section{Application Workflow and Functional Capabilities}
+
+AutoCover provides an end-to-end customer workflow from
+vehicle lookup to policy tracking.
+
+\subsection{Vehicle Lookup and Verification}
+
+The customer enters a registration number using a standard
+Indian vehicle registration format.
+
+The system:
+
+\begin{itemize}
+    \item Normalizes spaces, hyphens, and letter casing.
+    \item Retrieves matching vehicle details from the
+    local vehicle registry.
+    \item Displays vehicle specifications for verification.
+    \item Supports manual vehicle overrides when the
+    registered details require correction.
+    \item Provides a fallback draft vehicle profile when
+    a registration number is not found.
+\end{itemize}
+
+\subsection{Insurance Quote Comparison}
+
+After vehicle lookup, the application requests quotes
+from the four simulated providers.
+
+The comparison experience includes:
+
+\begin{itemize}
+    \item Provider response and status information.
+    \item Plan-level premium and IDV details.
+    \item GST and total premium breakdowns.
+    \item Add-on inclusion details.
+    \item Quote validity information.
+    \item Sorting and filtering controls.
+    \item Value Score indicators and recommendation badges.
+\end{itemize}
+
+\subsection{Side-by-Side Plan Comparison}
+
+Customers can compare plans through a detailed feature matrix.
+
+The comparison includes:
+
+\begin{itemize}
+    \item Insurance provider and plan name.
+    \item Coverage type.
+    \item Insured Declared Value.
+    \item Base premium.
+    \item GST amount.
+    \item Total premium.
+    \item Standardized add-on coverage.
+    \item Quote validity date.
+\end{itemize}
+
+\subsection{Policy Management}
+
+The policy dashboard stores selected policy information,
+including:
+
+\begin{itemize}
+    \item Policy number and provider.
+    \item Customer and vehicle association.
+    \item Plan and coverage details.
+    \item IDV and premium breakdown.
+    \item Policy start and expiry dates.
+    \item Add-on coverage.
+    \item Renewal reminder status.
+\end{itemize}
+
+The application also supports expiry tracking and simulated
+WhatsApp/SMS renewal reminder workflows.
+% ============================================================
+% APPLICATION SCREENSHOTS
+% ============================================================
+
+\subsection{Application Screenshots}
+
+The following screenshots demonstrate the actual running
+AutoCover application and its major customer-facing workflows.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth,
+    height=0.62\textheight,keepaspectratio]
+    {screenshots/01_home_vehicle_lookup.png}
+    \caption{\textbf{Vehicle Lookup and RC Verification:}
+    Homepage featuring vehicle registration lookup, quick-pick
+    demonstration profiles, vehicle specification verification,
+    and policy expiry information.}
+    \label{fig:vehicle-lookup}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth,
+    height=0.62\textheight,keepaspectratio]
+    {screenshots/02_quotes_comparison_grid.png}
+    \caption{\textbf{Multi-Provider Insurance Comparison:}
+    Consolidated quote results from Providers A, B, C, and D,
+    including plan cards, sorting and filtering controls,
+    Value Scores, and recommendation badges.}
+    \label{fig:quote-comparison}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth,
+    height=0.62\textheight,keepaspectratio]
+    {screenshots/03_side_by_side_modal.png}
+    \caption{\textbf{Side-by-Side Policy Comparison:}
+    Detailed comparison of insurance plans covering IDV,
+    base premium, GST, total premium, add-on coverage,
+    and quote validity.}
+    \label{fig:side-by-side}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth,
+    height=0.62\textheight,keepaspectratio]
+    {screenshots/04_policy_dashboard.png}
+    \caption{\textbf{Policy Portfolio Dashboard:}
+    Saved insurance policies, vehicle associations,
+    policy expiry tracking, and simulated renewal
+    notification functionality.}
+    \label{fig:policy-dashboard}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth,
+    height=0.62\textheight,keepaspectratio]
+    {screenshots/05_addon_glossary.png}
+    \caption{\textbf{Insurance Add-on Glossary:}
+    Standardized insurance add-on terminology and
+    references to public documentation from Acko,
+    HDFC ERGO, Digit, and ICICI Lombard.}
+    \label{fig:addon-glossary}
+\end{figure}
+
+\clearpage
+% ============================================================
+% 8. DATABASE DESIGN
+% ============================================================
+
+\section{Database Design and Persistence}
+
+AutoCover uses SQLAlchemy ORM to manage persistent application
+data.
+
+SQLite is the default database, allowing local execution without
+a separately installed database server. PostgreSQL is supported
+through the \texttt{DATABASE\_URL} environment variable.
+
+The documented database models include:
+
+\begin{enumerate}
+    \item \textbf{policies} -- Stores customer policy records,
+    pricing, coverage, and expiry information.
+
+    \item \textbf{vehicle\_overrides} -- Stores vehicle details
+    manually verified or overridden by the customer.
+\end{enumerate}
+
+\subsection{Policy Table}
+
+\begin{lstlisting}[language=SQL,caption={Policy Table Schema}]
+CREATE TABLE policies (
+    id VARCHAR(36) PRIMARY KEY,
+    policy_number VARCHAR(32) UNIQUE NOT NULL,
+    registration_number VARCHAR(20) NOT NULL,
+    customer_name VARCHAR(100) NOT NULL,
+    customer_phone VARCHAR(30) NOT NULL,
+    provider VARCHAR(50) NOT NULL,
+    plan_name VARCHAR(100) NOT NULL,
+    coverage_type VARCHAR(50) NOT NULL,
+    idv INTEGER NOT NULL,
+    base_premium FLOAT NOT NULL,
+    gst_amount FLOAT NOT NULL,
+    total_premium FLOAT NOT NULL,
+    addons TEXT DEFAULT '[]',
+    start_date DATE NOT NULL,
+    expiry_date DATE NOT NULL,
+    make VARCHAR(50),
+    model VARCHAR(50),
+    variant VARCHAR(50),
+    fuel_type VARCHAR(20),
+    reminder_sent BOOLEAN DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
 \end{lstlisting}
 
-\subsection{Compiling this LaTeX Report}
-\begin{lstlisting}[language=bash]
-# Compile using pdflatex (run twice for cross-references):
-pdflatex AutoCover_Report.tex
-pdflatex AutoCover_Report.tex
+\subsection{Vehicle Overrides Table}
 
-# Or compile using xelatex:
+\begin{lstlisting}[language=SQL,caption={Vehicle Overrides Table Schema}]
+CREATE TABLE vehicle_overrides (
+    registration_number VARCHAR(20) PRIMARY KEY,
+    make VARCHAR(50) NOT NULL,
+    model VARCHAR(50) NOT NULL,
+    variant VARCHAR(50),
+    fuel_type VARCHAR(20),
+    engine_cc INTEGER,
+    registration_date VARCHAR(20),
+    rto VARCHAR(50),
+    ex_showroom_price INTEGER,
+    current_policy_expiry VARCHAR(20),
+    claims_last_year INTEGER DEFAULT 0,
+    ncb_percent INTEGER DEFAULT 0,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+\end{lstlisting}
+
+\subsection{Database Configuration}
+
+The default SQLite configuration is:
+
+\begin{lstlisting}[language=bash]
+DATABASE_URL=sqlite:///./autocover.db
+\end{lstlisting}
+
+PostgreSQL can be configured using:
+
+\begin{lstlisting}[language=bash]
+DATABASE_URL=postgresql://user:password@localhost:5432/autocover
+\end{lstlisting}
+
+The application initializes its database tables and seeds
+demonstration data during initial startup.
+
+% ============================================================
+% 9. ASSUMPTIONS AND BUSINESS RULES
+% ============================================================
+
+\section{Assumptions and Business Rules}
+
+The application uses the following documented assumptions
+for quote evaluation and demonstration scenarios.
+
+\begin{enumerate}
+
+    \item \textbf{Reference Date}
+
+    Quote validity and expiry calculations use
+    \textbf{10 November 2026 (IST)} as the reference date.
+    This value is configurable through the
+    \texttt{REFERENCE\_DATE} environment variable.
+
+    \item \textbf{GST}
+
+    The application applies an 18\% GST assumption and
+    displays GST separately from the net base premium.
+
+    \item \textbf{Registration Number Normalization}
+
+    Spaces, hyphens, and letter casing are ignored when
+    comparing registration numbers.
+
+    For example:
+
+    \[
+    \texttt{wb 02 ab 1234}
+    \longrightarrow
+    \texttt{WB02AB1234}
+    \]
+
+    \item \textbf{Vehicle Registry Fallback}
+
+    When a registration number is unavailable in
+    \texttt{registry.json}, the application provides a
+    draft vehicle profile rather than immediately
+    rejecting the lookup.
+
+    \item \textbf{Provider C Depreciation}
+
+    Provider C follows the documented depreciation tiers,
+    with IDV rounded to the nearest ₹1,000 and premiums
+    rounded to the nearest rupee.
+
+    \item \textbf{Underwriting Eligibility}
+
+    Provider C declines vehicles older than eight years.
+
+\end{enumerate}
+
+\begin{warningbox}[title={Simulation Scope}]
+The four provider integrations represent simulated data sources
+for engineering evaluation. Provider latency and HTTP 503 failures
+are intentionally simulated. Renewal notifications are also
+simulated workflows rather than evidence of live insurer or
+messaging-service integrations.
+\end{warningbox}
+
+% ============================================================
+% 10. AUTOMATED TESTING
+% ============================================================
+
+\section{Automated Testing and Verification}
+
+The backend includes an automated test suite containing
+\textbf{14 tests} covering the main components of the system.
+
+The suite validates parser behavior, API functionality,
+business rules, provider tariff calculations, and asynchronous
+aggregation.
+
+\subsection{Running the Test Suite}
+
+Execute the following commands from the backend directory:
+
+\begin{lstlisting}[language=bash,caption={Automated Test Execution}]
+cd backend
+python -m pytest -v
+\end{lstlisting}
+
+\subsection{Documented Test Results}
+
+The following tests are documented as passing.
+
+\begin{lstlisting}[caption={pytest Test Suite Results}]
+tests/test_api.py::test_health PASSED
+tests/test_api.py::test_vehicle_lookup_api PASSED
+tests/test_api.py::test_glossary_api PASSED
+tests/test_api.py::test_mock_endpoints PASSED
+tests/test_api.py::test_policy_crud_and_reminder PASSED
+
+tests/test_parsers.py::test_provider_a_parsing PASSED
+tests/test_parsers.py::test_provider_b_parsing PASSED
+tests/test_parsers.py::test_provider_d_parsing PASSED
+
+tests/test_services.py::test_registration_normalization PASSED
+tests/test_services.py::test_flexible_date_parsing PASSED
+tests/test_services.py::test_vehicle_lookup PASSED
+tests/test_services.py::test_addon_glossary_mapping PASSED
+tests/test_services.py::test_provider_c_rate_card_logic PASSED
+
+tests/test_aggregator.py::test_full_aggregation_flow PASSED
+\end{lstlisting}
+
+\subsection{Test Coverage Summary}
+
+\begin{table}[H]
+\centering
+\caption{Automated Test Coverage}
+\begin{tabularx}{\textwidth}{L{3.5cm}C{2cm}Y}
+\toprule
+\textbf{Test Area} &
+\textbf{Tests} &
+\textbf{Validation Focus} \\
+\midrule
+
+API &
+5 &
+Health check, vehicle lookup, glossary, mock endpoints,
+and policy CRUD/reminder workflow. \\
+
+Provider Parsers &
+3 &
+JSON parsing, hydrated HTML extraction, and CSV parsing. \\
+
+Business Services &
+5 &
+Registration normalization, date parsing, vehicle lookup,
+add-on mapping, and tariff calculations. \\
+
+Aggregation &
+1 &
+Complete asynchronous provider aggregation flow. \\
+
+\midrule
+\textbf{Total} & \textbf{14} & \textbf{All documented tests passed} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+% ============================================================
+% 11. TEST CUSTOMER PROFILES
+% ============================================================
+
+\section{Test Customer Profiles}
+
+The homepage provides quick-pick test profiles to demonstrate
+different application scenarios without requiring customers
+to enter all vehicle details manually.
+
+\begin{longtable}{L{2.5cm}L{2.7cm}L{2.5cm}L{6cm}}
+\caption{Demonstration Vehicle Profiles}\\
+\toprule
+\textbf{Registration} &
+\textbf{Customer} &
+\textbf{Vehicle} &
+\textbf{Scenario} \\
+\midrule
+\endfirsthead
+
+\multicolumn{4}{c}{
+\small\textit{Table continued from previous page}
+}\\
+\toprule
+\textbf{Registration} &
+\textbf{Customer} &
+\textbf{Vehicle} &
+\textbf{Scenario} \\
+\midrule
+\endhead
+
+\bottomrule
+\endfoot
+
+\texttt{WB 02 AB 1234} &
+Rahul Sen &
+Maruti Swift VXi &
+Valid quotes across all four providers. The profile also
+demonstrates quotes approaching expiry in ten days. \\
+
+\texttt{kl-07-de-3030} &
+Priya Nair &
+Maruti Swift ZXi &
+Tests expired Provider A quotes and Provider D duplicate
+record handling. \\
+
+\texttt{MH12 EF 4321} &
+Arjun Mehta &
+Tata Nexon Diesel &
+Demonstrates complete quote aggregation and diesel engine
+capacity-based tariff calculations. \\
+
+\texttt{wb06cd5678} &
+Sanjay Gupta &
+Hyundai i20 &
+Vehicle older than ten years, demonstrating underwriting
+declines across Providers A, B, and C. \\
+
+\texttt{DL 3C AB 0042} &
+Fatima Khan &
+Hyundai Creta &
+Demonstrates one prior claim, 0\% NCB, and an expired
+Provider D Basic quote. \\
+
+\texttt{WB02AB9999} &
+Unregistered Test Vehicle &
+Custom Swift &
+Demonstrates fallback vehicle profile creation and
+dynamic Provider C rate card quote generation. \\
+
+\end{longtable}
+
+% ============================================================
+% 12. LOCAL SETUP
+% ============================================================
+
+\section{Local Setup and Execution Guide}
+
+The following instructions describe how to run AutoCover
+on a fresh machine.
+
+\subsection{Prerequisites}
+
+\begin{table}[H]
+\centering
+\caption{Required Development Environment}
+\begin{tabularx}{\textwidth}{L{4cm}L{4cm}Y}
+\toprule
+\textbf{Dependency} &
+\textbf{Minimum Version} &
+\textbf{Tested Version} \\
+\midrule
+Python & 3.10+ & 3.12 \\
+Node.js & 18+ & 22 \\
+npm & 9+ & Available with tested Node.js setup \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Step 1: Clone the Repository}
+
+\begin{lstlisting}[language=bash]
+git clone https://github.com/CodingEnthusiastic/AutoCover.git
+
+cd AutoCover
+\end{lstlisting}
+
+\subsection{Step 2: Backend Setup}
+
+Navigate to the backend directory:
+
+\begin{lstlisting}[language=bash]
+cd backend
+\end{lstlisting}
+
+Create and activate a Python virtual environment.
+
+\textbf{macOS / Linux:}
+
+\begin{lstlisting}[language=bash]
+python3 -m venv venv
+source venv/bin/activate
+\end{lstlisting}
+
+\textbf{Windows:}
+
+\begin{lstlisting}[language=bash]
+python -m venv venv
+.\venv\Scripts\activate
+\end{lstlisting}
+
+Install the backend dependencies:
+
+\begin{lstlisting}[language=bash]
+pip install -r requirements.txt
+\end{lstlisting}
+
+Configure the environment:
+
+\begin{lstlisting}[language=bash]
+cp .env.example .env
+\end{lstlisting}
+
+The default SQLite configuration works without a separately
+installed database server.
+
+Run the automated tests:
+
+\begin{lstlisting}[language=bash]
+python -m pytest -v
+\end{lstlisting}
+
+Alternatively, execute the standalone verification script:
+
+\begin{lstlisting}[language=bash]
+python verify_system.py
+\end{lstlisting}
+
+Start the backend server:
+
+\begin{lstlisting}[language=bash]
+python -m uvicorn main:app --reload --port 8000
+\end{lstlisting}
+
+The backend will be available at:
+
+\begin{center}
+\href{http://localhost:8000}{\texttt{http://localhost:8000}}
+\end{center}
+
+Interactive API documentation is available at:
+
+\begin{center}
+\href{http://localhost:8000/docs}{\texttt{http://localhost:8000/docs}}
+\end{center}
+
+\subsection{Step 3: Frontend Setup}
+
+Open a second terminal and navigate to the frontend directory:
+
+\begin{lstlisting}[language=bash]
+cd AutoCover/frontend
+\end{lstlisting}
+
+Install the frontend dependencies:
+
+\begin{lstlisting}[language=bash]
+npm install
+\end{lstlisting}
+
+Start the Vite development server:
+
+\begin{lstlisting}[language=bash]
+npm run dev
+\end{lstlisting}
+
+Open the application in a browser:
+
+\begin{center}
+\href{http://localhost:5173}{\texttt{http://localhost:5173}}
+\end{center}
+
+\begin{successbox}[title={Alternative Execution}]
+The backend can also serve the pre-built React frontend bundle
+directly at \texttt{http://localhost:8000/}, allowing the
+application to run through a single service when the frontend
+bundle has been built.
+\end{successbox}
+
+% ============================================================
+% 13. PROJECT STRUCTURE
+% ============================================================
+
+\section{Repository and Project Artifacts}
+
+The repository contains the frontend application, backend
+services, provider fixtures, test suite, and architecture
+documentation.
+
+The principal project artifacts are:
+
+\begin{table}[H]
+\centering
+\caption{Important Project Files}
+\begin{tabularx}{\textwidth}{L{4.3cm}Y}
+\toprule
+\textbf{File / Directory} & \textbf{Purpose} \\
+\midrule
+
+\texttt{backend/} &
+Backend application, API implementation, services,
+and persistence logic. \\
+
+\texttt{frontend/} &
+React and TypeScript customer-facing application. \\
+
+\texttt{backend/requirements.txt} &
+Python backend dependencies. \\
+
+\texttt{provider\_a.json} &
+Provider A JSON quote data. \\
+
+\texttt{provider\_b.html} &
+Provider B HTML and JavaScript hydration fixture. \\
+
+\texttt{provider\_c.pdf} &
+Provider C tariff rate card. \\
+
+\texttt{provider\_d.csv} &
+Provider D quote export fixture. \\
+
+\texttt{architecture.excalidraw} &
+Editable architecture diagram. \\
+
+\texttt{verify\_system.py} &
+Standalone system verification script. \\
+
+\texttt{tests/} &
+Automated backend test suite. \\
+
+\bottomrule
+\end{tabularx}
+\end{table}
+
+% ============================================================
+% 14. CONCLUSION
+% ============================================================
+
+\section{Conclusion}
+
+AutoCover demonstrates an end-to-end approach to consolidating
+vehicle insurance information from multiple heterogeneous sources
+into a unified comparison and policy management experience.
+
+The project brings together several practical full-stack
+engineering concepts:
+
+\begin{itemize}
+
+    \item Development of a typed React frontend and REST-based
+    Python backend.
+
+    \item Integration of multiple data formats through
+    provider-specific parsing strategies.
+
+    \item Handling of duplicate, expired, malformed, and
+    incomplete quote records.
+
+    \item Asynchronous request orchestration and isolation
+    of simulated provider failures.
+
+    \item Standardization of insurance add-ons through a
+    reusable canonical terminology layer.
+
+    \item Multi-factor plan scoring instead of relying
+    exclusively on the lowest premium.
+
+    \item Persistent policy management using SQLAlchemy ORM
+    with SQLite and PostgreSQL configuration support.
+
+    \item Automated testing across API endpoints, parsing,
+    business services, and complete aggregation flows.
+
+\end{itemize}
+
+The resulting platform provides a structured foundation for
+insurance quote comparison, demonstrates practical handling
+of inconsistent external data, and establishes an extensible
+architecture for additional provider integrations.
+
+\vspace{0.5cm}
+
+\begin{center}
+\begin{tcolorbox}[
+    width=0.9\textwidth,
+    colback=Navy,
+    colframe=Navy,
+    arc=3mm,
+    boxrule=0pt,
+    left=5mm,
+    right=5mm,
+    top=4mm,
+    bottom=4mm
+]
+\centering
+{\Large\bfseries\color{white} AutoCover}\\[5pt]
+{\normalsize\color{white}
+One vehicle lookup. Multiple insurance quotes.\\
+A unified comparison and policy management experience.
+}
+\end{tcolorbox}
+\end{center}
+
+% ============================================================
+% APPENDIX
+% ============================================================
+
+\appendix
+
+\section{Compiling the Technical Report}
+
+Save this document as:
+
+\begin{center}
+\texttt{AutoCover\_Report.tex}
+\end{center}
+
+Compile using pdfLaTeX:
+
+\begin{lstlisting}[language=bash]
+pdflatex AutoCover_Report.tex
+pdflatex AutoCover_Report.tex
+\end{lstlisting}
+
+The second compilation resolves cross-references and
+page numbering.
+
+Alternatively, use XeLaTeX:
+
+\begin{lstlisting}[language=bash]
 xelatex AutoCover_Report.tex
 \end{lstlisting}
 
-\subsection{Excalidraw Whiteboard Loading}
-To view or edit the system architecture diagram:
+\section{Opening the Architecture Diagram}
+
+The editable architecture drawing is stored in the repository
+as \texttt{architecture.excalidraw}.
+
+To view or edit it:
+
 \begin{enumerate}
-    \item Navigate to \url{https://excalidraw.com}.
-    \item Click \textbf{Open} or drag-and-drop the \texttt{architecture.excalidraw} file from the repository root.
+    \item Open \url{https://excalidraw.com}.
+    \item Select the option to open an existing drawing.
+    \item Select \texttt{architecture.excalidraw} from the
+    repository directory.
+    \item Edit or export the architecture diagram as required.
 \end{enumerate}
 
 \end{document}
