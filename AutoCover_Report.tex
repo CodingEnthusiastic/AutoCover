@@ -1,0 +1,170 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{tcolorbox}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!70!black,
+    citecolor=blue!70!black,
+    urlcolor=blue!70!black
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\textbf{AutoCover} --- Technical Submission Report}
+\lhead{Full-Stack Engineering Evaluation}
+\rfoot{Page \thepage}
+
+\title{\textbf{\LARGE AutoCover: A Fault-Tolerant, Multi-Provider Car Insurance Aggregation and Comparison Platform}\\[0.5em]
+\large Full-Stack Technical Round Submission Report}
+\author{\textbf{Rishabh} \\ \url{https://github.com/CodingEnthusiastic/AutoCover}}
+\date{\textbf{Reference Assessment Date:} 10 November 2026}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{fancy}
+
+\begin{abstract}
+Vehicle insurance procurement in fragmented digital markets requires consumers to navigate disparate websites, repeatedly re-enter regulatory specifications, and decipher convoluted proprietary marketing terms. This report documents the design, architecture, and empirical verification of \textbf{AutoCover}, an intelligent motor insurance comparison platform. AutoCover ingests raw quote data from four heterogeneous sources (JSON REST API, JavaScript-hydrated HTML DOM, India Motor Tariff PDF rate cards, and CSV exports), deduplicates and normalizes complex add-ons against public insurer research, isolates slow and intermittently failing providers using an asynchronous non-blocking aggregator, and computes multi-dimensional value scores to present unbiased consumer recommendations.
+\end{abstract}
+
+\vspace{1em}
+
+\section{System Overview \& Architecture}
+
+AutoCover is engineered with a strict decoupling between presentation, ingestion, normalization, and persistence:
+\begin{itemize}[leftmargin=1.5em]
+    \item \textbf{Presentation Layer (Frontend):} Built with React 18, TypeScript, and Tailwind CSS. Provides single-entry registration lookup, live provider collection status indicators, side-by-side multi-plan comparison matrices, and policy portfolio management.
+    \item \textbf{Aggregation \& API Layer (Backend):} Built with Python 3.12, FastAPI, and Pydantic V2. Handles asynchronous concurrent provider dispatching via \texttt{httpx.AsyncClient} and \texttt{asyncio.gather}.
+    \item \textbf{Persistence Layer:} Configured with SQLAlchemy ORM targeting SQLite for zero-configuration local review with seamless PostgreSQL compatibility.
+\end{itemize}
+
+\begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,title=\textbf{Key Functional Modules}]
+\begin{enumerate}[leftmargin=1.2em]
+    \item \textbf{Vehicle Normalization Engine:} Strips arbitrary whitespace, hyphens, and regional casing to standardize registrations (e.g. \texttt{wb 02 ab 1234} $\to$ \texttt{WB02AB1234}).
+    \item \textbf{Heterogeneous Provider Ingestion Drivers:} Specialized drivers for JSON payloads, hydrated HTML pages, deterministic PDF rate card tariffs, and malformed CSV rows.
+    \item \textbf{Canonical Add-on Glossary:} Maps disparate marketing names into 6 standardized coverage categories based on research across Acko, HDFC ERGO, Digit, and ICICI Lombard.
+    \item \textbf{Scoring \& Ranking Engine:} Balances price affordability, IDV coverage strength, and bundled add-on depth into an interpretable 0--100 Value Score.
+\end{enumerate}
+\end{tcolorbox}
+
+\section{Heterogeneous Data Source Ingestion}
+
+\subsection{Provider A: JSON API Response}
+Provider A provides REST API quotes with active plans, decline notices, and duplicate rows. 
+\begin{itemize}[leftmargin=1.2em]
+    \item \textbf{Deduplication:} Quote tuples of \texttt{(plan\_name, coverage, idv, premium, addons)} are hashed to filter duplicate entries (e.g. \texttt{WB02AB1234 Comprehensive Plus}).
+    \item \textbf{Tax Handling:} Standard 18\% GST is isolated from base premiums. Quotes specifying \texttt{premium\_includes\_gst: true} are back-calculated ($P_{\text{base}} = \frac{P_{\text{total}}}{1.18}$).
+    \item \textbf{Validity:} Validated against the assessment reference date (\texttt{2026-11-10}). Quotes with \texttt{valid\_until < 2026-11-10} (such as \texttt{KL07DE3030}) are marked as \texttt{EXPIRED}.
+\end{itemize}
+
+\subsection{Provider B: JavaScript-Hydrated HTML}
+Provider B serves an HTML quote summary with price placeholders (\texttt{Loading price\dots}). Real quotes are held in an inline JSON hydration block:
+\begin{lstlisting}[language=HTML,basicstyle=\ttfamily\footnotesize,frame=single]
+<script>
+window.__QUOTE_DATA__ = {
+  "B-101": {"total": "INR 12,830", "cover": "3.1 L", "valid_till": "30-11-2026"}
+};
+</script>
+\end{lstlisting}
+The parser extracts the hydration dictionary via regular expressions and joins it against DOM elements parsed by \texttt{BeautifulSoup}. Insured Declared Values (IDVs) specified in Lakhs (e.g. \texttt{3.1 L}) are converted to exact Rupee integers ($310,000$). Latency is artificially simulated at $\sim$1.5s to replicate a slow provider.
+
+\subsection{Provider C: PDF Rate Card Tariff Engine}
+Provider C does not provide quotes directly, but rather a published rate card operating under the \textbf{India Motor Tariff}. The rate card is evaluated dynamically relative to the vehicle's age on \texttt{2026-11-10}:
+\begin{equation}
+\text{Age}_{\text{years}} = \frac{\text{Date}_{\text{ref}} - \text{Date}_{\text{reg}}}{365.25}
+\end{equation}
+\begin{itemize}[leftmargin=1.2em]
+    \item \textbf{Depreciation Schedule:} $\le 6$ months: 5\%; 6m--1y: 15\%; 1--2y: 20\%; 2--3y: 30\%; 3--4y: 40\%; 4--5y: 50\%; 5--8y: $50\% + 5\% \times (\text{years} - 5)$; $>8$ years: \textbf{Declined}.
+    \item \textbf{Model Groups:} Group 1 (Swift, i20, Baleno, Alto, Tiago), Group 2 (Nexon, City, Sonet), Group 3 (Creta, XUV700, Innova).
+    \item \textbf{Third-Party (TP) Tariff:} $\le 1000$cc: ₹2,094; $1000$--$1500$cc: ₹3,416; $>1500$cc: ₹7,897.
+    \item \textbf{Add-on Computation:} \texttt{C-Shield} is offered only for vehicles $\le 5$ years of age. Nil Depreciation is charged at 15\% of net Own Damage (OD) premium after NCB, Roadside Assistance at ₹350 flat, and Consumables at ₹600 flat.
+\end{itemize}
+
+\subsection{Provider D: CSV Quote Export \& Fault Tolerance}
+Provider D provides comma-separated quote exports containing dirty numeric formats (\texttt{"11,670"}), mixed IDV notations (\texttt{"3.3 lakh"} vs \texttt{332000}), duplicate rows (\texttt{KL07DE3030 Gold}), and expired quotes (\texttt{15/10/2026}). Provider D includes a fault injection switch simulating intermittent HTTP 503 Service Unavailable outages, demonstrating isolated error handling without crashing other providers.
+
+\section{Add-on Normalization \& Public Insurer Research}
+
+To build a definitive add-on taxonomy, public documentation across four leading Indian insurers was analyzed:
+\begin{enumerate}[leftmargin=1.5em]
+    \item \textbf{Acko General Insurance:} \url{https://www.acko.com/car-insurance/add-on-covers/}
+    \item \textbf{HDFC ERGO General Insurance:} \url{https://www.hdfcergo.com/car-insurance/add-on-covers}
+    \item \textbf{Digit Insurance:} \url{https://www.godigit.com/motor-insurance/car-insurance/add-ons}
+    \item \textbf{ICICI Lombard:} \url{https://www.icicilombard.com/motor-insurance/car-insurance/add-on-covers}
+\end{enumerate}
+
+\begin{table}[ht]
+\centering
+\small
+\caption{Canonical Add-on Normalization Taxonomy}
+\label{tab:glossary}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Canonical Code} & \textbf{Standard Name} & \textbf{Observed Provider Terms} & \textbf{Key Coverage Concept} \\ \midrule
+\texttt{ZERO\_DEP} & Zero Depreciation & Bumper to Bumper, Nil Dep, Zero Dep & 100\% parts replacement without depreciation \\
+\texttt{RSA} & Roadside Assistance & 24x7 RSA, Roadside Support & Breakdown towing, puncture, emergency fuel \\
+\texttt{ENGINE\_PROTECT} & Engine Protection & Engine \& Gearbox Protection & Hydrostatic lock and lubricant leakage \\
+\texttt{RETURN\_TO\_INVOICE} & Return to Invoice & Total Cover, RTI, Invoice Cover & Bridges gap between IDV and ex-showroom price \\
+\texttt{CONSUMABLES} & Consumables Cover & Consumables, Cost of Consumables & Nuts, bolts, engine oil, washers, and fluids \\
+\texttt{KEY\_REPLACEMENT} & Key Replacement & Key Protect, Key Replacement & Replacement keys and lock mechanism \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\section{Multi-Dimensional Value Scoring}
+
+AutoCover scores each available plan on a 0--100 scale:
+\begin{equation}
+S_{\text{total}} = S_{\text{price}} + S_{\text{idv}} + S_{\text{addons}} + S_{\text{validity}}
+\end{equation}
+where:
+\begin{itemize}[leftmargin=1.5em]
+    \item $S_{\text{price}} \in [0, 35]$: Linear normalization of total premium relative to the minimum and maximum quoted market prices.
+    \item $S_{\text{idv}} \in [0, 30]$: Ratio of protected insured declared value relative to market ex-showroom price.
+    \item $S_{\text{addons}} \in [0, 30]$: Weighted coverage depth (Zero Dep: 12pts, Engine Protect: 7pts, RSA: 5pts, Return to Invoice: 4pts, Consumables: 2pts).
+    \item $S_{\text{validity}} = 5$: Active validity bonus.
+\end{itemize}
+
+\section{Empirical Evaluation \& Test Matrix}
+
+\begin{table}[ht]
+\centering
+\small
+\caption{Automated Verification Across Test Customers (Ref: 10 Nov 2026)}
+\label{tab:test_matrix}
+\begin{tabular}{@{}llcccl@{}}
+\toprule
+\textbf{Registration} & \textbf{Make / Model} & \textbf{Avail.} & \textbf{Exp.} & \textbf{Decl.} & \textbf{Special Characteristics Verified} \\ \midrule
+\texttt{WB02AB1234} & Maruti Swift VXi & 10 & 0 & 0 & Quoted across all 4 providers; expiring in 10 days. \\
+\texttt{KL07DE3030} & Maruti Swift ZXi & 7 & 3 & 0 & Provider A quotes expired (05/11/2026); Prov D deduped. \\
+\texttt{MH12EF4321} & Tata Nexon XZ+ & 10 & 0 & 0 & Full coverage across all 4 providers. \\
+\texttt{WB06CD5678} & Hyundai i20 Asta & 0 & 0 & 3 & Age $>10$ yrs; declined by Prov A, B, and C. \\
+\texttt{DL3CAB0042} & Hyundai Creta SX & 9 & 1 & 0 & 1 claim last year (0\% NCB); Prov D Basic quote expired. \\
+\texttt{WB02AB9999} & Custom Swift & 3 & 0 & 0 & Dynamic rate card generation for unindexed vehicle. \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\section{Compilation Commands}
+
+To compile this report into a publication-ready PDF, run:
+\begin{lstlisting}[language=bash,basicstyle=\ttfamily\small,frame=single]
+# Compile via pdflatex:
+pdflatex AutoCover_Report.tex
+pdflatex AutoCover_Report.tex
+
+# Or compile via xelatex:
+xelatex AutoCover_Report.tex
+\end{lstlisting}
+
+\end{document}

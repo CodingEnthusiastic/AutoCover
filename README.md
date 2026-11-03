@@ -1,295 +1,277 @@
-# AutoCover
-## Smart Vehicle Insurance Comparison Platform
+# AutoCover — Smart Vehicle Insurance Comparison & Management
 
-**Full-Stack Engineering Assignment**
-
-**Difficulty:** Intermediate
-**Expected duration:** 2–3 days
-**Technology:** Candidate's choice (recommended stack: React, TypeScript, Python, FastAPI, PostgreSQL)
-**AI tools:** Permitted
+**AutoCover** is an end-to-end car insurance aggregation, comparison, and policy lifecycle platform. A customer enters their vehicle registration number once; AutoCover aggregates quotes from four distinct simulated providers across heterogeneous data formats (JSON REST API, hydrated HTML, PDF rate card, and CSV export), standardizes disparate coverage terminology into canonical add-on concepts, ranks plans using a multi-dimensional value score, and provides policy issuance and automated renewal tracking.
 
 ---
 
-## 1. Background
+## 1. Quick Start & Setup Instructions
 
-Imagine a customer whose car insurance policy is about to expire.
+Follow these step-by-step instructions to run the application on a fresh machine.
 
-To renew their insurance, they currently need to visit multiple insurance provider websites, enter their vehicle information repeatedly, collect available plans and compare premiums, coverage, add-ons and other benefits.
-
-This process is time-consuming and makes it difficult to identify the most suitable option.
-
-We want to simplify this experience.
-
-Your task is to build **AutoCover**, a platform that collects insurance information from multiple providers, processes it into a consistent format and presents the customer with a clear comparison of available insurance plans.
-
-The customer should be able to enter their vehicle registration number once, review the available options, select a plan and save their policy information.
-
-The objective is to build a working information aggregation and comparison platform.
-
-## 2. Core requirements
-
-### Part A — Vehicle information
-
-Build a vehicle lookup experience.
-
-The user should be able to:
-
-- Enter a vehicle registration number.
-- Retrieve the available vehicle information.
-- View and verify the retrieved details.
-- Correct relevant information if necessary.
-- Proceed to insurance plan discovery.
-
-Display information such as:
-
-- Registration number
-- Manufacturer and model
-- Variant
-- Fuel type
-- Registration year
-- Registration location
-- Existing policy expiry date, if available
-
-Use the provided vehicle data source (`data/registry.json`).
-
-### Part B — Information collection
-
-Build a mechanism to collect insurance information from multiple independent providers.
-
-You are given data from four simulated insurance providers (see section 3). They provide information in different formats:
-
-- JSON responses
-- HTML pages, including JavaScript-rendered content
-- Downloadable documents (PDF)
-- CSV exports
-
-Your application should:
-
-- Investigate and retrieve information from the available sources.
-- Handle different response structures.
-- Extract relevant insurance plan information.
-- Handle missing or incomplete information.
-- Handle slow or unavailable providers.
-- Avoid duplicate records.
-- Convert the collected information into a consistent structure.
-
-You are not required to integrate real insurance companies or purchase actual policies.
-
-### Part C — Data processing and comparison
-
-Create a common data structure for the insurance plans collected from different providers.
-
-The comparison should consider:
-
-- Insurance provider
-- Plan name
-- Total premium
-- GST
-- Insured Declared Value (IDV)
-- Coverage type
-- Available add-ons
-- Other relevant benefits
-- Quote validity, where available
-
-The system should account for differences in how providers represent their information.
-
-**Add-on glossary.** Providers use different names for add-ons. Research the public add-on pages of **at least three real insurers** (see section 3.3) and use them to build a glossary that maps each provider's add-on names to common concepts. Record the pages you used.
-
-Present the available plans in a way that makes comparison easy.
-
-Users should be able to:
-
-- View available plans.
-- Sort by price.
-- Filter by coverage or add-ons.
-- Compare important plan attributes.
-- Understand why one plan may be preferable to another.
-- Select a plan.
-
-Do not assume that the cheapest plan is automatically the best option.
-
-### Part D — Policy management
-
-After selecting a plan, the user should be able to review and confirm their selection.
-
-Implement a mock confirmation process.
-
-No actual insurance purchase or payment integration is required.
-
-Create a policy management section where users can:
-
-- View their selected policies.
-- See the associated vehicle.
-- View the selected provider and plan.
-- See the premium and policy dates.
-- Identify policies approaching expiry.
-
-Persist relevant information in a database.
-
-## 3. Data sources
-
-### 3.1 Provided files (`data/`)
-
-| File | What it is |
-|---|---|
-| `registry.json` | Vehicle registry extract |
-| `provider_a.json` | Provider A: quote API response |
-| `provider_b.html` | Provider B: saved quote results page |
-| `provider_c.pdf` | Provider C: rate card |
-| `provider_d.csv` | Provider D: quote export |
-| `test_customers.json` | Test customers and registration numbers to try |
-
-The sources are intentionally different in how they expose their information. There is no further documentation: your responsibility is to investigate these sources and determine how to retrieve and interpret the required information.
-
-**Reference date:** treat **10 November 2026 (IST)** as "today" for anything that depends on the date (quote validity, policy expiry). Keep it configurable.
-
-### 3.2 Treat each provider as an external service
-
-In the real world each provider is a separate system that can be slow or fail. Serve each provider's file through **your own small mock service** (one per provider, or one service with separate endpoints), and have your application collect from those services, not by reading the files directly.
-
-Make at least one provider **slow** and one **intermittently failing**, and show how your application copes. You may build this yourself or use public test endpoints such as `https://httpbin.org/delay/5` and `https://httpbin.org/status/503`.
-
-### 3.3 Public information you may use
-
-You may use public information to understand and enrich the data, for example:
-
-- The General Insurance Council's IDV calculator: https://idv.gicouncil.in/
-- Insurers' public pages that explain car insurance add-ons and IDV.
-
-Rules: read only public pages; respect each website's `robots.txt` and terms of use; do not use quote forms, logins or OTPs; do not bypass CAPTCHAs or bot protection. Real insurers' prices are not public. **All plan prices come from the provided files.**
-
-**Optional: enrich from more public sources.** You may pull extra information from other public sources (for example RTO code to city/state, official third-party premium rates, IDV ranges from the GI Council calculator) to fill gaps or cross-check the providers. For every value, keep its source URL and the date you fetched it, and show it separately from provider data. Your application must still work if that source is down. Plan prices must still come only from the provided files.
-
-## 4. Technical expectations
-
-You are free to choose your implementation approach.
-
-We recommend:
-
-**Frontend**
-- React
-- TypeScript
-- Responsive UI
-
-**Backend**
-- Python
-- FastAPI
-- Pydantic
-
-**Database**
-- PostgreSQL
-
-**Testing**
-- pytest or an equivalent testing framework
-
-You may use other technologies if you can explain your decisions.
-
-Your implementation should demonstrate:
-
-- Clear separation of responsibilities.
-- Reusable components and services.
-- Reasonable database design.
-- Error handling.
-- Input validation.
-- Maintainable code.
-- Appropriate testing.
-
-You do not need to over-engineer the application.
-
-## 5. Expected user experience
-
-Your application should cover the following user journey:
-
-1. Enter vehicle registration number.
-2. Retrieve and verify vehicle details.
-3. Initiate insurance information collection.
-4. View collection progress or meaningful loading states.
-5. Review available insurance plans.
-6. Compare, filter and sort plans.
-7. Select and confirm a plan.
-8. View the saved policy in the policy dashboard.
-
-The interface should be intuitive and usable on both desktop and mobile screens.
-
-## 6. Optional enhancements
-
-These features are not mandatory and should only be attempted after the core requirements are working.
-
-**Notifications**
-- Send a notification when comparison results are available.
-- Send confirmation after plan selection.
-- Use the WhatsApp Cloud API test number, Telegram, or a mock notification service.
-
-**Renewal reminders**
-- Identify policies expiring within 15 days.
-- Implement a scheduled reminder mechanism.
-- Prevent duplicate reminders.
-
-**Deployment**
-- Deploy the application so we can open it from a link (any free hosting is fine). Put the link at the top of your README.
-- A deployed app is a plus, not a requirement. A clean local setup is enough.
-
-**Additional improvements**
-- Quote history.
-- Retry failed providers.
-- Background processing.
-- More advanced plan ranking.
-- Improved comparison experience.
-
-## 7. Submission requirements
-
-Please submit:
-
-1. Source code for the complete application (a link to your own repository).
-2. README with clear setup and run instructions: prerequisites, environment variables (with a `.env.example`), how to create the database, how to start the mock provider services, backend and frontend, and how to run the tests. We will follow it step by step on a fresh machine.
-3. Database schema or migrations.
-4. Description of how you investigated and integrated the data sources.
-5. Explanation of your data normalisation approach, including your add-on glossary and its sources.
-6. Details of important technical decisions and trade-offs.
-7. Tests covering important application behaviour.
-8. Screenshots or a short demonstration video of the working application.
-9. If you used AI tools: an `AI_USAGE.md` file listing the tools you used and the main prompts you gave them (copy them as written, in order), with a short note on what you changed or fixed in the AI's output.
-10. If you deployed it: the live link.
-
-The application should be runnable locally using the instructions provided.
-
-Please build in **your own new repository**. Do not open pull requests or issues on this one.
-
-## 8. Use of AI tools
-
-You are permitted to use AI coding assistants and other development tools.
-
-However:
-
-- You must understand the code you submit.
-- You must be able to explain your architecture.
-- You must be able to explain the data extraction and processing logic.
-- You must list the AI tools and the main prompts you used in `AI_USAGE.md` (see section 7).
-- You are responsible for the correctness and reliability of the final application.
-
-We evaluate engineering understanding, not the amount of code written manually.
-
-## 9. What we are looking for
-
-We are interested in how you approach an unfamiliar engineering problem.
-
-We will consider:
-
-- Your ability to investigate unfamiliar data sources.
-- How you extract and process information.
-- How you handle inconsistent data.
-- How you design a reliable backend.
-- How you structure your frontend.
-- How you handle failures and edge cases.
-- Your attention to the user experience.
-- Your ability to explain technical decisions.
-
-We do not expect a production-ready insurance platform.
-
-We expect a working, thoughtfully engineered solution that demonstrates your ability to take a problem from investigation to implementation.
-
-**Good luck!**
+### Prerequisites
+- **Python 3.10+** (Tested on Python 3.12)
+- **Node.js 18+** & **npm 9+** (Tested on Node v22)
 
 ---
 
-*All vehicles, customers, phone numbers, providers and prices in this repository are fictional and exist only for this assignment.*
+### Step 1: Clone the Repository
+```bash
+git clone https://github.com/CodingEnthusiastic/AutoCover.git
+cd AutoCover
+```
+
+---
+
+### Step 2: Backend Setup & Database Initialization
+
+1. Open a terminal and navigate to `backend/`:
+   ```bash
+   cd backend
+   ```
+2. Create and activate a virtual environment (optional but recommended):
+   ```bash
+   # On macOS/Linux:
+   python3 -m venv venv
+   source venv/bin/activate
+
+   # On Windows:
+   python -m venv venv
+   .\venv\Scripts\activate
+   ```
+3. Install backend dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+4. Configure environment variables (defaults work out of the box with zero setup):
+   ```bash
+   cp .env.example .env
+   ```
+   *The database defaults to SQLite (`sqlite:///./autocover.db`), which automatically creates all tables and seeds demonstration data on initial startup. PostgreSQL can be used simply by setting `DATABASE_URL=postgresql://user:password@localhost:5432/autocover`.*
+
+5. Run automated tests to verify your setup:
+   ```bash
+   python -m pytest -v
+   ```
+   Or run the standalone end-to-end verification script:
+   ```bash
+   python verify_system.py
+   ```
+
+6. Start the Backend API & Mock Providers server:
+   ```bash
+   python -m uvicorn main:app --reload --port 8000
+   ```
+   *The backend will be running at `http://localhost:8000` (API documentation available at `http://localhost:8000/docs`).*
+
+---
+
+### Step 3: Frontend Setup & Launch
+
+1. In a second terminal, navigate to `frontend/`:
+   ```bash
+   cd frontend
+   ```
+2. Install frontend dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the Vite development server:
+   ```bash
+   npm run dev
+   ```
+4. Open your browser and navigate to:
+   ```
+   http://localhost:5173
+   ```
+
+*(Note: The backend also serves the pre-built React bundle directly from `http://localhost:8000/` if you prefer single-service execution!)*
+
+---
+
+## 2. System Architecture
+
+```mermaid
+flowchart TD
+    User["Customer / Browser"] -->|"1. Enter Reg No. (e.g. WB 02 AB 1234)"| FE["React + TypeScript UI"]
+    FE -->|"2. Vehicle Lookup & Verification"| API["FastAPI Backend"]
+    API -->|"Lookup & Cache"| DB[("SQLite / PostgreSQL Database")]
+    
+    API -->|"Async Concurrent Aggregation"| Agg["Insurance Aggregator"]
+    
+    Agg -->|"HTTP GET (JSON)"| PA["Provider A Mock (Fast Quote API)"]
+    Agg -->|"HTTP GET (HTML)"| PB["Provider B Mock (Hydrated DOM, ~1.5s delay)"]
+    Agg -->|"HTTP GET (PDF)"| PC["Provider C Mock (Rate Card / Tariff Engine)"]
+    Agg -->|"HTTP GET (CSV)"| PD["Provider D Mock (CSV Export, 503 Fault Injection)"]
+    
+    PA -->|"Raw Quotes"| Norm["Data Normalizer & Deduplicator"]
+    PB -->|"Extracted DOM + Script State"| Norm
+    PC -->|"Tariff Depreciation & CC Rules"| Norm
+    PD -->|"Parsed Rows"| Norm
+    
+    Norm -->|"Standardize Terminology"| Gloss["Canonical Add-on Glossary"]
+    Gloss -->|"Multi-factor Scoring"| Rank["Intelligent Ranking Engine"]
+    Rank -->|"Unified Comparison Response"| FE
+```
+
+---
+
+## 3. Data Source Investigation & Integration
+
+Each provider represents insurance data through a fundamentally different format and transport mechanism:
+
+| Provider | Ingested Format | Characteristics & Handling |
+|---|---|---|
+| **Provider A** | JSON API response (`provider_a.json`) | Contains active quotes, decline notices (e.g. `WB06CD5678` rejected for vehicle age > 10 yrs), and duplicate rows (e.g. index 1 and 2 for `WB02AB1234`). Add-ons are provided as uppercase codes (`ZERO_DEP`, `RSA`). Includes tax structures (`[{name: "GST", rate: 0.18}]`) or all-inclusive tags. |
+| **Provider B** | HTML Webpage with JavaScript Hydration (`provider_b.html`) | Quotes are rendered in a static DOM shell with `<span class="price">Loading price…</span>` while real prices, Lakh-formatted covers (e.g. `"3.1 L"`), and validity dates are stored in an embedded script tag: `window.__QUOTE_DATA__ = {...}`. Parsed using regex and BeautifulSoup, accurately extracting IDV in Lakhs and breaking down inclusive 18% GST. Simulates a **slow provider** (~1.5s latency). |
+| **Provider C** | Rate Card PDF (`provider_c.pdf`) | A published tariff document following the **India Motor Tariff**. Does not store static quotes; instead, provides deterministic underwriting formulas based on vehicle age depreciation (5% to 65%), engine CC third-party bands (₹2,094, ₹3,416, ₹7,897), model groups (Group 1, 2, 3), NCB discounts, and add-on percentages. Rejects vehicles older than 8 years. Evaluated dynamically relative to the reference date `2026-11-10`. |
+| **Provider D** | CSV Quote Export (`provider_d.csv`) | Contains comma-separated values with dirty data: mixed registration formats, comma-formatted currency strings (`"11,670"`), mixed IDV notations (`"3.3 lakh"` vs `332000`), pipe-delimited add-ons (`Zero Dep|RSA`), duplicate records (`KL 07 DE 3030 Gold` appears twice), and expired quotes (`15/10/2026`). Simulates **intermittent 503 service downtime** with an in-app retry mechanism. |
+
+---
+
+## 4. Add-on Normalization & Insurer Research
+
+Different insurers use proprietary marketing names for identical coverage concepts. To normalize these reliably, we researched the public add-on pages of **4 leading Indian general insurers**:
+
+### Public Insurer Research Citations
+1. **Acko General Insurance**  
+   - Source: [https://www.acko.com/car-insurance/add-on-covers/](https://www.acko.com/car-insurance/add-on-covers/)  
+   - Verified terms: *Zero Depreciation Cover*, *Roadside Assistance*, *Engine Protection Cover*, *Key Protect*, *Invoice Cover*, *Consumables Cover*.
+2. **HDFC ERGO General Insurance**  
+   - Source: [https://www.hdfcergo.com/car-insurance/add-on-covers](https://www.hdfcergo.com/car-insurance/add-on-covers)  
+   - Verified terms: *Zero Depreciation*, *Emergency Assistance Cover / RSA*, *Engine & Gearbox Protector*, *Cost of Consumables*, *Return to Invoice*.
+3. **Digit Insurance (Go Digit)**  
+   - Source: [https://www.godigit.com/motor-insurance/car-insurance/add-ons](https://www.godigit.com/motor-insurance/car-insurance/add-ons)  
+   - Verified terms: *Bumper-to-Bumper Cover (Zero Dep)*, *Breakdown Assistance*, *Engine & Gearbox Protection*, *Return to Invoice*.
+4. **ICICI Lombard General Insurance**  
+   - Source: [https://www.icicilombard.com/motor-insurance/car-insurance/add-on-covers](https://www.icicilombard.com/motor-insurance/car-insurance/add-on-covers)  
+   - Verified terms: *Nil Depreciation*, *Roadside Assistance*, *Key Protect*, *Engine Protect Plus*.
+
+### Canonical Mapping Matrix
+
+| Canonical Code | Canonical Display Name | Provider A Term | Provider B Term | Provider C Term | Provider D Term |
+|---|---|---|---|---|---|
+| `ZERO_DEP` | **Zero Depreciation** | `ZERO_DEP` | `Bumper to Bumper` | `Nil Depreciation` | `Zero Dep` |
+| `RSA` | **Roadside Assistance** | `RSA` | `24x7 Roadside Assistance` | `Roadside Assistance` | `RSA` |
+| `ENGINE_PROTECT` | **Engine & Gearbox Protection** | — | `Engine & Gearbox Protection` | `Engine Protect` | `Engine Protect` |
+| `RETURN_TO_INVOICE`| **Return to Invoice** | — | `Total Cover` | `Return to Invoice` | — |
+| `CONSUMABLES` | **Consumables Cover** | — | — | `Consumables` | — |
+| `KEY_REPLACEMENT`| **Key Replacement** | — | `Key Replacement` | — | — |
+
+---
+
+## 5. Value Scoring & Plan Ranking
+
+Rather than assuming the cheapest plan is best, AutoCover computes a multi-dimensional **Value Score (0 to 100)**:
+1. **Price Affordability (35 pts)**: Normalized position between minimum and maximum quoted market premiums.
+2. **IDV Coverage Strength (30 pts)**: Ratio of insured declared value protected relative to market ex-showroom valuation.
+3. **Add-on Protection Depth (30 pts)**: Weighted credit for essential covers:
+   - Zero Depreciation: +12 pts
+   - Engine & Gearbox Protection: +7 pts
+   - Roadside Assistance: +5 pts
+   - Return to Invoice: +4 pts
+   - Consumables Cover: +2 pts
+4. **Validity & Provider Reliability (5 pts)**: Active quote bonus.
+
+### Smart Badging
+- **`Best Value`**: Highest composite score balancing price and coverage depth.
+- **`Lowest Price`**: Minimum net premium plan for budget-conscious drivers.
+- **`Maximum Coverage`**: Plan offering the highest number of bundled add-ons and IDV.
+
+---
+
+## 6. Assumptions
+
+1. **Reference Date**: Evaluated as **10 November 2026 (IST)** across all quote validity checks and policy expiry countdowns (configurable via `REFERENCE_DATE` environment variable).
+2. **Goods and Services Tax (GST)**: Standard Indian motor insurance GST of **18%** is consistently calculated and displayed separately from net base premiums.
+3. **Vehicle Registration Normalization**: Indian vehicle registration formats are leniently stripped of spaces, hyphens, and casing (e.g. `wb 02 ab 1234` $\rightarrow$ `WB02AB1234`).
+4. **Vehicle Registry Fallback**: If a registration number is not found in `registry.json` (such as test cases `WB02AB9999` or `12345`), the system displays a draft vehicle card allowing the user to verify or enter specifications rather than hard-failing.
+5. **Provider Rate Card Depreciation**: Provider C follows the India Motor Tariff half-up rounding to the nearest ₹1,000 for IDV and nearest ₹1 for premiums. Vehicles exceeding 8 years are formally marked as `DECLINED`.
+
+---
+
+## 7. Database Schema
+
+Managed via SQLAlchemy ORM (`app/models.py`):
+
+```sql
+CREATE TABLE policies (
+    id VARCHAR(36) PRIMARY KEY,
+    policy_number VARCHAR(32) UNIQUE NOT NULL,
+    registration_number VARCHAR(20) NOT NULL,
+    customer_name VARCHAR(100) NOT NULL,
+    customer_phone VARCHAR(30) NOT NULL,
+    provider VARCHAR(50) NOT NULL,
+    plan_name VARCHAR(100) NOT NULL,
+    coverage_type VARCHAR(50) NOT NULL,
+    idv INTEGER NOT NULL,
+    base_premium FLOAT NOT NULL,
+    gst_amount FLOAT NOT NULL,
+    total_premium FLOAT NOT NULL,
+    addons TEXT DEFAULT '[]',
+    start_date DATE NOT NULL,
+    expiry_date DATE NOT NULL,
+    make VARCHAR(50),
+    model VARCHAR(50),
+    variant VARCHAR(50),
+    fuel_type VARCHAR(20),
+    reminder_sent BOOLEAN DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE vehicle_overrides (
+    registration_number VARCHAR(20) PRIMARY KEY,
+    make VARCHAR(50) NOT NULL,
+    model VARCHAR(50) NOT NULL,
+    variant VARCHAR(50),
+    fuel_type VARCHAR(20),
+    engine_cc INTEGER,
+    registration_date VARCHAR(20),
+    rto VARCHAR(50),
+    ex_showroom_price INTEGER,
+    current_policy_expiry VARCHAR(20),
+    claims_last_year INTEGER DEFAULT 0,
+    ncb_percent INTEGER DEFAULT 0,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+---
+
+## 8. Test Suite Coverage
+
+The test suite contains 14 automated tests covering parsers, rate card calculations, add-on normalization, API endpoints, and async aggregation:
+
+```bash
+cd backend
+python -m pytest -v
+```
+
+Output:
+```
+tests/test_api.py::test_health PASSED
+tests/test_api.py::test_vehicle_lookup_api PASSED
+tests/test_api.py::test_glossary_api PASSED
+tests/test_api.py::test_mock_endpoints PASSED
+tests/test_api.py::test_policy_crud_and_reminder PASSED
+tests/test_parsers.py::test_provider_a_parsing PASSED
+tests/test_parsers.py::test_provider_b_parsing PASSED
+tests/test_parsers.py::test_provider_d_parsing PASSED
+tests/test_services.py::test_registration_normalization PASSED
+tests/test_services.py::test_flexible_date_parsing PASSED
+tests/test_services.py::test_vehicle_lookup PASSED
+tests/test_services.py::test_addon_glossary_mapping PASSED
+tests/test_services.py::test_provider_c_rate_card_logic PASSED
+tests/test_aggregator.py::test_full_aggregation_flow PASSED
+```
+
+---
+
+## 9. Test Customers to Try
+
+Quick-pick buttons are available directly on the homepage UI:
+- **`WB 02 AB 1234`** (Rahul Sen) — Maruti Swift VXi (Valid quotes across all 4 providers, expiring in 10 days).
+- **`kl-07-de-3030`** (Priya Nair) — Maruti Swift ZXi (Tests Provider A expired quotes & Provider D deduplication).
+- **`MH12 EF 4321`** (Arjun Mehta) — Tata Nexon Diesel (Full quotes across providers).
+- **`wb06cd5678`** (Sanjay Gupta) — Hyundai i20 (>10 yrs old, demonstrating underwriting decline handling across Provider A, B, and C).
+- **`DL 3C AB 0042`** (Fatima Khan) — Hyundai Creta (1 claim last year, NCB 0%, Provider D has 1 expired quote).
+- **`WB02AB9999`** — Unregistered car (Demonstrates draft profile fallback & dynamic Provider C Rate Card quote generation).
